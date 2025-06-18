@@ -5,7 +5,10 @@ import SignUp from './Screen/SignUp';
 import SignIn from './Screen/SignIn';
 import MovieDetailScreen from './Screen/MovieDetailScreen';
 import SelectSeatScreen from './Screen/selectSeatScreen';
-
+import User from './Screen/User';
+import HomeScreen from './Screen/HomeScreen';
+import MyTicket from './Screen/MyTicket';
+import ConfirmOTP from './Screen/ConfirmOTP';
 export default function App() {
   return (
     // <WelcomeScreen/>
@@ -13,6 +16,10 @@ export default function App() {
     // <SignIn/>
     // <MovieDetailScreen/>
     <SelectSeatScreen/>
+    // <ConfirmOTP/>
+    // <MyTicket/>
+    // <HomeScreen/>
+    // <User/>
   );
 }
 
