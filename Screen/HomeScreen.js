@@ -131,6 +131,7 @@ const styles = StyleSheet.create({
   },
   header: {
     marginBottom: 10,
+    marginTop:40,
   },
   greeting: {
     color: '#fff',
