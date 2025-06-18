@@ -11,11 +11,11 @@ import MyTicket from './Screen/MyTicket';
 import ConfirmOTP from './Screen/ConfirmOTP';
 export default function App() {
   return (
-    // <WelcomeScreen/>
+    <WelcomeScreen/>
     // <SignUp/>
     // <SignIn/>
     // <MovieDetailScreen/>
-    <SelectSeatScreen/>
+    // <SelectSeatScreen/>
     // <ConfirmOTP/>
     // <MyTicket/>
     // <HomeScreen/>
