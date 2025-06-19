@@ -4,31 +4,28 @@ import { StyleSheet, Text, View } from 'react-native';
 import WelcomeScreen from './Screen/Welcome';
 import SignUp from './Screen/SignUp';
 import SignIn from './Screen/SignIn';
+import ConfirmOTP from './Screen/ConfirmOTP';
+import User from "./Screen/User";
 import HomeScreen from './Screen/HomeScreen';
 import ProfileScreen from './Screen/ProfileScreen';
 import TicketScreen from './Screen/TicketScreen';
 import MovieScreen from './Screen/MovieScreen';
+import MovieDetailScreen from './Screen/MovieDetailScreen';
+import SelectSeatScreen from './Screen/selectSeatScreen';
+import MyTicket from './Screen/MyTicket';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 
+const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
-export default function App() {
+function MainTabs() {
   return (
-    // <WelcomeScreen/>
-    // <SignUp/>
-    // <SignIn/>
-    // <MovieDetailScreen/>
-    // <SelectSeatScreen/>
-    // <ConfirmOTP/>
-    // <MyTicket/>
-    // <HomeScreen/>
-    // <User/>
-    <NavigationContainer>
-      <Tab.Navigator
+    <Tab.Navigator
         screenOptions={({ route }) => ({
             // Icon tùy theo tên màn hình
             tabBarIcon: ({ focused, color, size }) => {
@@ -62,6 +59,30 @@ export default function App() {
         <Tab.Screen name="Movie" component={MovieScreen} options={{tabBarLabel:"Phim"}} />
         <Tab.Screen name="Profile" component={ProfileScreen} options={{tabBarLabel:"Cá nhân"}} />
       </Tab.Navigator>
+  );
+}
+export default function App() {
+  return (
+     //<WelcomeScreen/>
+     //<SignUp/>
+     //<SignIn/>
+     //<ConfirmOTP/>
+     //<User/>
+     //<MovieDetailScreen/>
+     //<SelectSeatScreen/>
+    // <ConfirmOTP/>
+    // <MyTicket/>
+     //<HomeScreen/>
+    // <User/>
+    <NavigationContainer>
+      <Stack.Navigator screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="Welcome" component={WelcomeScreen} />
+        <Stack.Screen name="SignIn" component={SignIn} />
+        <Stack.Screen name="SignUp" component={SignUp} />
+        <Stack.Screen name="ConfirmOTP" component={ConfirmOTP} />
+        <Stack.Screen name="User" component={User} />
+        <Stack.Screen name="MainTabs" component={MainTabs} />
+      </Stack.Navigator>
     </NavigationContainer>
   );
 }

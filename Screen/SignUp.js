@@ -3,11 +3,19 @@ import React from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image } from 'react-native';
 import { Ionicons, FontAwesome, AntDesign } from '@expo/vector-icons';
 
-const SignUp = () => {
+const SignUp = ({navigation}) => {
+
+  // const [phone, setPhone] = useState('');
+
+  const handleNext = () => {
+    // Gửi mã OTP
+    navigation.navigate('ConfirmOTP');
+  };
+
   return (
     <View style={styles.container}>
       {/* Back Arrow */}
-      <TouchableOpacity style={styles.backButton}>
+      <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
         <Ionicons name="arrow-back" size={24} color="white" />
       </TouchableOpacity>
 
@@ -22,7 +30,7 @@ const SignUp = () => {
       <View style={styles.divider} />
 
       {/* Continue Button */}
-      <TouchableOpacity style={styles.continueButton}>
+      <TouchableOpacity style={styles.continueButton} onPress={handleNext}>
         <Text style={styles.continueText}>Continue</Text>
       </TouchableOpacity>
 

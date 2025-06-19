@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
-const WelcomeScreen = () => {
+const WelcomeScreen = ({navigation}) => {
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor="black" />
@@ -38,10 +38,10 @@ const WelcomeScreen = () => {
         <View style={styles.dot} />
       </View>
       <View style={styles.buttonWrapper}>
-        <TouchableOpacity style={styles.signInBtn}>
+        <TouchableOpacity style={styles.signInBtn} onPress={() => navigation.navigate('SignIn')}>
           <Text style={styles.signInText}>Sign in</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.signUpBtn}>
+        <TouchableOpacity style={styles.signUpBtn} onPress={() => navigation.navigate('SignUp')}>
           <Text style={styles.signUpText}>Sign up</Text>
         </TouchableOpacity>
       </View>
