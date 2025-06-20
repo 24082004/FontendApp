@@ -1,4 +1,3 @@
-// SignIn.js
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 import { Ionicons, FontAwesome, AntDesign, Feather } from '@expo/vector-icons';
@@ -8,15 +7,10 @@ const SignIn = ({navigation}) => {
 
   return (
     <View style={styles.container}>
-      {/* Back Button */}
       <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
         <Ionicons name="arrow-back" size={24} color="white" />
       </TouchableOpacity>
-
-      {/* Title */}
-      <Text style={styles.title}>Sign in</Text>
-
-      {/* Phone Input */}
+      <Text style={styles.title}>Đăng nhập</Text>
       <View style={styles.inputWrapper}>
         <FontAwesome name="phone" size={20} color="white" style={styles.icon} />
         <TextInput
@@ -27,8 +21,6 @@ const SignIn = ({navigation}) => {
         />
       </View>
       <View style={styles.divider} />
-
-      {/* Password Input */}
       <View style={styles.inputWrapper}>
         <Feather name="lock" size={20} color="white" style={styles.icon} />
         <TextInput
@@ -42,34 +34,26 @@ const SignIn = ({navigation}) => {
         </TouchableOpacity>
       </View>
       <View style={styles.divider} />
-
-      {/* Continue Button */}
       <TouchableOpacity style={styles.continueButton}>
-        <Text style={styles.continueText}>Sign In</Text>
+        <Text style={styles.continueText}>Đăng nhập</Text>
       </TouchableOpacity>
-
-      {/* Or continue with */}
       <View style={styles.orContainer}>
         <View style={styles.line} />
-        <Text style={styles.orText}>Or continue with</Text>
+        <Text style={styles.orText}>Hoặc tiếp tục với</Text>
         <View style={styles.line} />
       </View>
-
-      {/* Facebook Button */}
       <TouchableOpacity style={styles.socialButton}>
         <FontAwesome name="facebook" size={20} color="white" style={styles.socialIcon} />
         <Text style={styles.socialText}>Facebook</Text>
       </TouchableOpacity>
-
-      {/* Google Button */}
       <TouchableOpacity style={styles.socialButton}>
         <AntDesign name="google" size={20} color="white" style={styles.socialIcon} />
         <Text style={styles.socialText}>Google</Text>
       </TouchableOpacity>
-
-      {/* Terms */}
       <Text style={styles.terms}>
-        By signing in, you agree to our Terms of Service and Privacy Policy
+          Bằng việc đăng nhập hoặc đăng ký, bạn đồng ý với{' '}
+          <Text style={styles.link}>Điều khoản dịch vụ</Text> và{' '}
+          <Text style={styles.link}>Chính sách bảo mật </Text>của chúng tôi.
       </Text>
     </View>
   );
@@ -159,6 +143,9 @@ const styles = StyleSheet.create({
     bottom: 20,
     left: 20,
     right: 20,
+  },
+  link: {
+    color: '#facc15',
   },
 });
 

@@ -23,16 +23,11 @@ const User = ({navigation}) => {
       style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
-      {/* Nút quay lại */}
       <TouchableOpacity style={styles.backButton} onPress={()=> navigation.goBack()}>
         <Text style={styles.backText}>←</Text>
       </TouchableOpacity>
-
-      {/* Tiêu đề */}
       <Text style={styles.title}>Nhập tên người dùng</Text>
       <Text style={styles.subtitle}>Chỉ dùng chữ cái Latin, không chứa emoji hoặc ký hiệu</Text>
-
-      {/* Ô nhập */}
       <TextInput
         style={styles.input}
         placeholder="Tên người dùng"
@@ -42,8 +37,6 @@ const User = ({navigation}) => {
         autoCapitalize="none"
         keyboardType="default"
       />
-
-      {/* Nút Xong */}
       <TouchableOpacity style={styles.doneButton} onPress={handleDone}>
         <Text style={styles.doneText}>Xong</Text>
       </TouchableOpacity>

@@ -11,7 +11,6 @@ const ConfirmOTP = ({navigation}) => {
     setOtp(newOtp);
 
     if (text && index < 5) {
-      // move to next
       inputs[index + 1].focus();
     }
   };

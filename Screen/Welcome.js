@@ -26,8 +26,8 @@ const WelcomeScreen = ({navigation}) => {
         style={styles.poster}
         resizeMode="cover"
       />
-      <Text style={styles.title}>MBooking hello!</Text>
-      <Text style={styles.subtitle}>Enjoy your favorite movies</Text>
+      <Text style={styles.title}>Xin chào MBooking!</Text>
+      <Text style={styles.subtitle}>Thưởng thức những bộ phim yêu thích của bạn</Text>
       <View style={styles.dotsContainer}>
         <View style={[styles.dot, styles.activeDot]} />
         <View style={styles.dot} />
@@ -35,16 +35,16 @@ const WelcomeScreen = ({navigation}) => {
       </View>
       <View style={styles.buttonWrapper}>
         <TouchableOpacity style={styles.signInBtn} onPress={() => navigation.navigate('SignIn')}>
-          <Text style={styles.signInText}>Sign in</Text>
+          <Text style={styles.signInText}>Đăng nhập</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.signUpBtn} onPress={() => navigation.navigate('SignUp')}>
-          <Text style={styles.signUpText}>Sign up</Text>
+          <Text style={styles.signUpText}>Đăng ký</Text>
         </TouchableOpacity>
       </View>
       <Text style={styles.footerText}>
-        By sign in or sign up, you agree to our{' '}
-        <Text style={styles.link}>Terms of Service</Text> and{' '}
-        <Text style={styles.link}>Privacy Policy</Text>
+        Bằng việc đăng nhập hoặc đăng ký, bạn đồng ý với{' '}
+        <Text style={styles.link}>Điều khoản dịch vụ</Text> và{' '}
+        <Text style={styles.link}>Chính sách bảo mật </Text>của chúng tôi.
       </Text>
     </SafeAreaView>
   );

@@ -8,54 +8,40 @@ const SignUp = ({navigation}) => {
   // const [phone, setPhone] = useState('');
 
   const handleNext = () => {
-    // Gửi mã OTP
     navigation.navigate('ConfirmOTP');
   };
 
   return (
     <View style={styles.container}>
-      {/* Back Arrow */}
       <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
         <Ionicons name="arrow-back" size={24} color="white" />
       </TouchableOpacity>
-
-      {/* Title */}
-      <Text style={styles.title}>Sign up</Text>
-
-      {/* Phone Input */}
+      <Text style={styles.title}>Đăng ký</Text>
       <View style={styles.inputContainer}>
         <FontAwesome name="phone" size={20} color="white" style={styles.icon} />
         <Text style={styles.phoneText}>(704) 555-0127</Text>
       </View>
       <View style={styles.divider} />
-
-      {/* Continue Button */}
       <TouchableOpacity style={styles.continueButton} onPress={handleNext}>
-        <Text style={styles.continueText}>Continue</Text>
+        <Text style={styles.continueText}>Tiếp tục</Text>
       </TouchableOpacity>
-
-      {/* Or continue with */}
       <View style={styles.orContainer}>
         <View style={styles.line} />
-        <Text style={styles.orText}>Or continue with</Text>
+        <Text style={styles.orText}>Hoặc tiếp tục với</Text>
         <View style={styles.line} />
       </View>
-
-      {/* Facebook Button */}
       <TouchableOpacity style={styles.socialButton}>
         <FontAwesome name="facebook" size={20} color="white" style={styles.socialIcon} />
         <Text style={styles.socialText}>Facebook</Text>
       </TouchableOpacity>
-
-      {/* Google Button */}
       <TouchableOpacity style={styles.socialButton}>
         <AntDesign name="google" size={20} color="white" style={styles.socialIcon} />
         <Text style={styles.socialText}>Google</Text>
       </TouchableOpacity>
-
-      {/* Terms */}
       <Text style={styles.terms}>
-        By sign in or sign up, you agree to our Terms of Service and Privacy Policy
+          Bằng việc đăng nhập hoặc đăng ký, bạn đồng ý với{' '}
+          <Text style={styles.link}>Điều khoản dịch vụ</Text> và{' '}
+          <Text style={styles.link}>Chính sách bảo mật </Text>của chúng tôi.
       </Text>
     </View>
   );
@@ -143,6 +129,9 @@ const styles = StyleSheet.create({
     bottom: 20,
     left: 20,
     right: 20,
+  },
+  link: {
+    color: '#facc15',
   },
 });
 

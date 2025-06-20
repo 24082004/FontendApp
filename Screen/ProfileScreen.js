@@ -9,7 +9,6 @@ const ProfileScreen = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* Header User Info */}
       <View style={styles.userInfo}>
         <Image
           source={{ uri: 'https://i.pravatar.cc/150?img=47' }}
@@ -24,25 +23,10 @@ const ProfileScreen = () => {
           <Icon name="edit-3" size={20} color="#fff" />
         </TouchableOpacity>
       </View>
-
-      {/* Options */}
       <View style={styles.menu}>
         <OptionItem icon="gift" label="Vé của tôi" />
         <OptionItem icon="shopping-cart" label="Lịch sử thanh toán" />
-        <OptionItem icon="globe" label="Thay đổi ngôn ngữ" />
         <OptionItem icon="lock" label="Đổi mật khẩu" />
-        <View style={styles.optionRow}>
-          <View style={styles.optionLeft}>
-            <Icon name="smile" size={20} color="#fff" style={styles.icon} />
-            <Text style={styles.label}>Face ID / Touch ID</Text>
-          </View>
-          <Switch
-            trackColor={{ false: '#767577', true: '#f4cf4e' }}
-            thumbColor={isFaceIDEnabled ? '#f4cf4e' : '#f4f3f4'}
-            onValueChange={toggleSwitch}
-            value={isFaceIDEnabled}
-          />
-        </View>
       </View>
     </SafeAreaView>
   );
@@ -61,7 +45,7 @@ const OptionItem = ({ icon, label }) => (
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000', // Dark mode background
+    backgroundColor: '#000',
     padding: 16,
   },
   userInfo: {

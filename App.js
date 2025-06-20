@@ -26,15 +26,6 @@ const Tab = createBottomTabNavigator();
 
 function MainTabs() {
   return (
-    // <WelcomeScreen/>
-    // <SignUp/>
-    // <SignIn/>
-    // <MovieDetailScreen/>
-    // <SelectSeatScreen/>
-    // <ConfirmOTP/>
-    // <MyTicket/>
-    // <HomeScreen/>
-    // <User/>
     <Tab.Navigator
       screenOptions={({ route }) => ({
         tabBarIcon: ({ focused, color, size }) => {
@@ -67,7 +58,7 @@ function MainTabs() {
       <Tab.Screen name="Movie" component={MovieScreen} options={{ tabBarLabel: "Phim" }} />
       <Tab.Screen name="Profile" component={ProfileScreen} options={{ tabBarLabel: "Cá nhân" }} />
     </Tab.Navigator>
-  );        
+  );
 };
 
 export default function App() {

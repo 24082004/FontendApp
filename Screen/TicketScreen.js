@@ -63,7 +63,7 @@ export default TicketScreen;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000', // Black background
+    backgroundColor: '#000',
     paddingTop: 50,
     paddingHorizontal: 16,
   },

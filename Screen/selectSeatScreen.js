@@ -25,7 +25,7 @@ export default function SelectSeatScreen() {
 
   return (
     <ScrollView style={styles.container}>
-      <Text style={styles.title}>Chọn Ghế Ng</Text>
+      <Text style={styles.title}>Chọn ghế ngồi</Text>
 
       <View style={styles.seatMap}>
         {seatRows.map(row => (
@@ -54,7 +54,7 @@ export default function SelectSeatScreen() {
         <Legend color="#FDC536" label="Selected" />
       </View>
 
-      <Text style={styles.sectionTitle}>Select Date & Time</Text>
+      <Text style={styles.sectionTitle}>Chọn ngày và giờ chiếu</Text>
 
       <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.scrollHorizontal}>
         {dates.map(date => (
@@ -81,9 +81,9 @@ export default function SelectSeatScreen() {
       </ScrollView>
 
       <View style={styles.footer}>
-        <Text style={styles.total}>Total{"\n"}<Text style={styles.totalPrice}>{totalPrice.toLocaleString()} VND</Text></Text>
+        <Text style={styles.total}>Tổng cộng{"\n"}<Text style={styles.totalPrice}>{totalPrice.toLocaleString()} VND</Text></Text>
         <TouchableOpacity style={styles.buyButton}>
-          <Text style={styles.buyText}>Buy ticket</Text>
+          <Text style={styles.buyText}>Mua vé</Text>
         </TouchableOpacity>
       </View>
     </ScrollView>
