@@ -31,9 +31,6 @@ const MovieDetailScreen = ({ route }) => {
           <View style={styles.reviewRow}>
             <Text style={styles.rating}>⭐ {rating}</Text>
             <Text style={styles.reviewCount}>({votes})</Text>
-            <TouchableOpacity style={styles.trailerBtn}>
-              <Text style={styles.trailerText}>▶ Xem trailer</Text>
-            </TouchableOpacity>
           </View>
           <View style={styles.starRow}>
             {[...Array(5)].map((_, i) => (
@@ -199,17 +196,6 @@ const styles = StyleSheet.create({
   },
   reviewCount: {
     color: '#999',
-    fontSize: 12,
-  },
-  trailerBtn: {
-    marginLeft: 'auto',
-    padding: 4,
-    borderColor: '#999',
-    borderWidth: 1,
-    borderRadius: 4,
-  },
-  trailerText: {
-    color: '#fff',
     fontSize: 12,
   },
   starRow: {

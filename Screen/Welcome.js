@@ -20,10 +20,6 @@ const WelcomeScreen = ({navigation}) => {
           <Text style={styles.logoHighlight}>oo</Text>
           king
         </Text>
-        <TouchableOpacity style={styles.languageBtn}>
-          <Icon name="language" size={18} color="#fff" />
-          <Text style={styles.languageText}>English</Text>
-        </TouchableOpacity>
       </View>
       <Image
         source={require('../Asset/we.png')}
@@ -74,15 +70,6 @@ const styles = StyleSheet.create({
   },
   logoHighlight: {
     color: '#facc15',
-  },
-  languageBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  languageText: {
-    color: '#fff',
-    marginLeft: 4,
-    fontSize: 14,
   },
   poster: {
     width: '100%',
