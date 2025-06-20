@@ -30,7 +30,6 @@ export default function App() {
     <NavigationContainer>
       <Tab.Navigator
         screenOptions={({ route }) => ({
-            // Icon tùy theo tên màn hình
             tabBarIcon: ({ focused, color, size }) => {
               let iconName;
 
@@ -46,15 +45,14 @@ export default function App() {
 
               return <Ionicons name={iconName} size={size} color={color} />;
             },
-            // Tuỳ chỉnh màu sắc tab
-            tabBarActiveTintColor: '#FCC434', // Màu khi chọn
-            tabBarInactiveTintColor: '#ccc',  // Màu không chọn
+            tabBarActiveTintColor: '#FCC434',
+            tabBarInactiveTintColor: '#ccc',
             tabBarStyle: {
-              backgroundColor: '#000', // Màu nền của bottom tab
+              backgroundColor: '#000',
               borderTopWidth: 0,
               height: 100,
             },
-            headerShown: false, // Ẩn header nếu muốn
+            headerShown: false,
           })}
       >
         <Tab.Screen name="Home" component={HomeScreen} options={{tabBarLabel:"Trang chủ"}} />
