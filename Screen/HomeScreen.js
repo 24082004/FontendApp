@@ -1,7 +1,7 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, Image, TextInput } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Image, TextInput, TouchableOpacity } from 'react-native';
 
-export default function HomeScreen() {
+export default function HomeScreen({ navigation }) {
   return (
     <ScrollView style={styles.container}>
       <View style={styles.header}>
@@ -13,36 +13,74 @@ export default function HomeScreen() {
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Đang chiếu</Text>
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-          <View style={styles.nowPlayingItem}>
-            <Image 
-              source={require('../Asset/we.png')} 
-              style={styles.nowPlayingPoster} 
-              resizeMode="cover" 
-            />
-            <Text style={styles.movieTitle}>Avengers - Cuộc Chiến Vô Cực</Text>
-            <Text style={styles.movieDetail}>2h 29p · Hành động, Phiêu lưu, Khoa học viễn tưởng</Text>
-            <Text style={styles.movieRating}>⭐ 8.4/10</Text>
-          </View>
-          <View style={styles.nowPlayingItem}>
-            <Image 
-              source={require('../Asset/we.png')} 
-              style={styles.nowPlayingPoster} 
-              resizeMode="cover" 
-            />
-            <Text style={styles.movieTitle}>Avatar 2</Text>
-            <Text style={styles.movieDetail}>3h 12p · Hành động, Phiêu lưu, Khoa học viễn tưởng</Text>
-            <Text style={styles.movieRating}>⭐ 7.9/10</Text>
-          </View>
-          <View style={styles.nowPlayingItem}>
-            <Image 
-              source={require('../Asset/we.png')} 
-              style={styles.nowPlayingPoster} 
-              resizeMode="cover" 
-            />
-            <Text style={styles.movieTitle}>Người Kiến</Text>
-            <Text style={styles.movieDetail}>2h 5p · Hành động, Hài</Text>
-            <Text style={styles.movieRating}>⭐ 7.2/10</Text>
-          </View>
+          <TouchableOpacity
+            onPress={() => navigation.navigate('MovieDetail', {
+              title: 'Avengers - Cuộc Chiến Vô Cực',
+              duration: '2h 29p',
+              releaseDate: '16.12.2022',
+              genre: 'Hành động, Phiêu lưu, Khoa học viễn tưởng',
+              rating: 8.4,
+              votes: 1222,
+              image: require('../Asset/we.png'),
+            })}
+          >
+            <View style={styles.nowPlayingItem}>
+              <Image 
+                source={require('../Asset/we.png')} 
+                style={styles.nowPlayingPoster} 
+                resizeMode="cover" 
+              />
+              <Text style={styles.movieTitle}>Avengers - Cuộc Chiến Vô Cực</Text>
+              <Text style={styles.movieDetail}>2h 29p · Hành động, Phiêu lưu, Khoa học viễn tưởng</Text>
+              <Text style={styles.movieRating}>⭐ 8.4/10</Text>
+            </View>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            onPress={() => navigation.navigate('MovieDetail', {
+              title: 'Avatar 2',
+              duration: '3h 12p',
+              releaseDate: '20.12.2022',
+              genre: 'Hành động, Phiêu lưu, Khoa học viễn tưởng',
+              rating: 7.9,
+              votes: 1050,
+              image: require('../Asset/we.png'),
+            })}
+          >
+            <View style={styles.nowPlayingItem}>
+              <Image 
+                source={require('../Asset/we.png')} 
+                style={styles.nowPlayingPoster} 
+                resizeMode="cover" 
+              />
+              <Text style={styles.movieTitle}>Avatar 2</Text>
+              <Text style={styles.movieDetail}>3h 12p · Hành động, Phiêu lưu, Khoa học viễn tưởng</Text>
+              <Text style={styles.movieRating}>⭐ 7.9/10</Text>
+            </View>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            onPress={() => navigation.navigate('MovieDetail', {
+              title: 'Người Kiến',
+              duration: '2h 5p',
+              releaseDate: '10.01.2023',
+              genre: 'Hành động, Hài',
+              rating: 7.2,
+              votes: 900,
+              image: require('../Asset/we.png'),
+            })}
+          >
+            <View style={styles.nowPlayingItem}>
+              <Image 
+                source={require('../Asset/we.png')} 
+                style={styles.nowPlayingPoster} 
+                resizeMode="cover" 
+              />
+              <Text style={styles.movieTitle}>Người Kiến</Text>
+              <Text style={styles.movieDetail}>2h 5p · Hành động, Hài</Text>
+              <Text style={styles.movieRating}>⭐ 7.2/10</Text>
+            </View>
+          </TouchableOpacity>
         </ScrollView>
       </View>
 
