@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, KeyboardAvoidingView, Platform } from 'react-native';
 
-const ConfirmOTP = () => {
+const ConfirmOTP = ({navigation}) => {
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
   const [timer, setTimer] = useState(59);
 
@@ -23,7 +23,7 @@ const ConfirmOTP = () => {
       style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
-      <TouchableOpacity style={styles.backButton}>
+      <TouchableOpacity style={styles.backButton} onPress={()=> navigation.goBack()}>
         <Text style={styles.backText}>←</Text>
       </TouchableOpacity>
 
@@ -48,7 +48,7 @@ const ConfirmOTP = () => {
 
       <Text style={styles.timer}>00:{timer.toString().padStart(2, '0')}</Text>
 
-      <TouchableOpacity style={styles.continueButton}>
+      <TouchableOpacity style={styles.continueButton} onPress={()=> navigation.navigate('User')}>
         <Text style={styles.continueText}>Continue</Text>
       </TouchableOpacity>
     </KeyboardAvoidingView>

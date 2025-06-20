@@ -3,13 +3,13 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 import { Ionicons, FontAwesome, AntDesign, Feather } from '@expo/vector-icons';
 
-const SignIn = () => {
+const SignIn = ({navigation}) => {
   const [showPassword, setShowPassword] = useState(false);
 
   return (
     <View style={styles.container}>
       {/* Back Button */}
-      <TouchableOpacity style={styles.backButton}>
+      <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
         <Ionicons name="arrow-back" size={24} color="white" />
       </TouchableOpacity>
 

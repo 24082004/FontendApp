@@ -9,12 +9,13 @@ import {
   Platform,
 } from 'react-native';
 
-const User = () => {
+const User = ({navigation}) => {
   const [username, setUsername] = useState('');
 
   const handleDone = () => {
     // Xử lý khi nhấn nút Xong, ví dụ: xác thực username
     console.log('Tên người dùng:', username);
+    navigation.navigate('MainTabs');
   };
 
   return (
@@ -23,7 +24,7 @@ const User = () => {
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
       {/* Nút quay lại */}
-      <TouchableOpacity style={styles.backButton}>
+      <TouchableOpacity style={styles.backButton} onPress={()=> navigation.goBack()}>
         <Text style={styles.backText}>←</Text>
       </TouchableOpacity>
 
