@@ -4,6 +4,7 @@ import { Ionicons, FontAwesome, AntDesign, Feather } from '@expo/vector-icons';
 
 const SignIn = ({navigation}) => {
   const [showPassword, setShowPassword] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
 
   return (
     <View style={styles.container}>
@@ -11,21 +12,22 @@ const SignIn = ({navigation}) => {
         <Ionicons name="arrow-back" size={24} color="white" />
       </TouchableOpacity>
       <Text style={styles.title}>Đăng nhập</Text>
-      <View style={styles.inputWrapper}>
-        <FontAwesome name="phone" size={20} color="white" style={styles.icon} />
+
+      <View style={styles.inputBox}>
+        <FontAwesome name="envelope" size={20} color="white" style={styles.icon} />
         <TextInput
           style={styles.input}
-          placeholder="Phone number"
+          placeholder="Nhập email"
           placeholderTextColor="#888"
-          keyboardType="phone-pad"
+          keyboardType="email-address"
         />
       </View>
       <View style={styles.divider} />
-      <View style={styles.inputWrapper}>
+      <View style={styles.inputBox}>
         <Feather name="lock" size={20} color="white" style={styles.icon} />
         <TextInput
           style={styles.input}
-          placeholder="Password"
+          placeholder="Nhập mật khẩu"
           placeholderTextColor="#888"
           secureTextEntry={!showPassword}
         />
@@ -33,22 +35,19 @@ const SignIn = ({navigation}) => {
           <Feather name={showPassword ? 'eye-off' : 'eye'} size={20} color="#888" />
         </TouchableOpacity>
       </View>
-      <View style={styles.divider} />
+
+      <View style={styles.rowOptions}>
+        <TouchableOpacity style={styles.checkboxContainer} onPress={() => {setRememberMe(!rememberMe)}}>
+          <Feather name={rememberMe ? 'check-circle' : 'circle'} size={18} color={rememberMe ? '#FFC107' : '#888'}/>
+          <Text style={styles.rememberText}>Nhớ mật khẩu</Text>
+        </TouchableOpacity>
+        <TouchableOpacity>
+          <Text style={styles.forgotText}>Quên mật khẩu</Text>
+        </TouchableOpacity>
+      </View>
+      <View/>
       <TouchableOpacity style={styles.continueButton}>
         <Text style={styles.continueText}>Đăng nhập</Text>
-      </TouchableOpacity>
-      <View style={styles.orContainer}>
-        <View style={styles.line} />
-        <Text style={styles.orText}>Hoặc tiếp tục với</Text>
-        <View style={styles.line} />
-      </View>
-      <TouchableOpacity style={styles.socialButton}>
-        <FontAwesome name="facebook" size={20} color="white" style={styles.socialIcon} />
-        <Text style={styles.socialText}>Facebook</Text>
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.socialButton}>
-        <AntDesign name="google" size={20} color="white" style={styles.socialIcon} />
-        <Text style={styles.socialText}>Google</Text>
       </TouchableOpacity>
       <Text style={styles.terms}>
           Bằng việc đăng nhập hoặc đăng ký, bạn đồng ý với{' '}
@@ -75,23 +74,41 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     marginBottom: 40,
   },
-  inputWrapper: {
+  inputBox: {
     flexDirection: 'row',
     alignItems: 'center',
+    borderWidth: 1,
+    borderColor: 'white',
+    borderRadius: 10,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    marginBottom: 20,
   },
+
   icon: {
     marginRight: 10,
   },
   input: {
     flex: 1,
     color: 'white',
-    fontSize: 18,
+    fontSize: 16,
     paddingVertical: 10,
   },
-  divider: {
-    height: 1,
-    backgroundColor: '#444',
-    marginVertical: 20,
+  rowOptions: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 30,
+  },
+  checkboxContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  rememberText: {
+    color: 'white',
+    marginLeft: 6
+  },
+  forgotText: {
+    color: '#FFC107'
   },
   continueButton: {
     backgroundColor: '#FFC107',
@@ -103,36 +120,6 @@ const styles = StyleSheet.create({
   continueText: {
     color: 'black',
     fontWeight: '600',
-    fontSize: 16,
-  },
-  orContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 20,
-  },
-  orText: {
-    color: 'white',
-    marginHorizontal: 10,
-  },
-  line: {
-    flex: 1,
-    height: 1,
-    backgroundColor: '#444',
-  },
-  socialButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#222',
-    paddingVertical: 15,
-    paddingHorizontal: 20,
-    borderRadius: 30,
-    marginBottom: 15,
-  },
-  socialIcon: {
-    marginRight: 10,
-  },
-  socialText: {
-    color: 'white',
     fontSize: 16,
   },
   terms: {

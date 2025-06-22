@@ -49,7 +49,7 @@ export default function HomeScreen({ navigation }) {
           >
             <View style={styles.nowPlayingItem}>
               <Image 
-                source={require('../Asset/we.png')} 
+                source={require('../assets/avatar2.png')} 
                 style={styles.nowPlayingPoster} 
                 resizeMode="cover" 
               />
@@ -132,7 +132,7 @@ export default function HomeScreen({ navigation }) {
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
           <View style={styles.newsItem}>
             <Image 
-              source={require('../Asset/we.png')} 
+              source={require('../assets/batman.png')} 
               style={styles.newsImage}
               resizeMode="cover"
             />
