@@ -1,21 +1,42 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, KeyboardAvoidingView, Platform } from 'react-native';
+import AuthService from '../Services/AuthService';
 
-const ConfirmOTP = ({navigation}) => {
+const ConfirmOTP = ({navigation, route}) => {
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
-  const [timer, setTimer] = useState(59);
+  const [timer, setTimer] = useState(60);
+  const inputs = [];
+
+  const email = route.params?.email;
 
   const handleChange = (text, index) => {
     const newOtp = [...otp];
     newOtp[index] = text;
     setOtp(newOtp);
 
-    if (text && index < 5) {
+    if (text && index < 5 && inputs[index + 1]) {
       inputs[index + 1].focus();
     }
   };
 
-  const inputs = [];
+  const handleVeriOTP = async () => {
+    const otpCode = otp.join('');
+    if(otpCode.length !== 6){
+      alert("Bạn phải nhập đủ 6 chữ số OTP");
+      return;
+    } try {
+      const res = await AuthService.verifyOTP(email, otpCode);
+      if(res.success){
+        alert("Xác thực OTP thành công");
+        navigation.navigate('User');
+      } else{
+        alert(res.error || "Xác thực OTP thất bại");
+      }
+    } catch(err){
+      console.log("OTP error:", err);
+      alert(err.error || "Có lỗi xảy ra khi xác thực OTP")
+    }
+  };
 
   return (
     <KeyboardAvoidingView
@@ -26,9 +47,9 @@ const ConfirmOTP = ({navigation}) => {
         <Text style={styles.backText}>←</Text>
       </TouchableOpacity>
 
-      <Text style={styles.title}>Confirm OTP code</Text>
+      <Text style={styles.title}>Xác thực OTP</Text>
       <Text style={styles.subtitle}>
-        You just need to enter the OTP sent to the registered phone number (704) 555-0127.
+        Mã OTP đã được gửi đến email: {email}
       </Text>
 
       <View style={styles.otpContainer}>
@@ -47,8 +68,8 @@ const ConfirmOTP = ({navigation}) => {
 
       <Text style={styles.timer}>00:{timer.toString().padStart(2, '0')}</Text>
 
-      <TouchableOpacity style={styles.continueButton} onPress={()=> navigation.navigate('User')}>
-        <Text style={styles.continueText}>Continue</Text>
+      <TouchableOpacity style={styles.continueButton} onPress={handleVeriOTP}>
+        <Text style={styles.continueText}>Tiếp tục</Text>
       </TouchableOpacity>
     </KeyboardAvoidingView>
   );

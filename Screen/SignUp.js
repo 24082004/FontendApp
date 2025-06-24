@@ -38,7 +38,7 @@ const SignUp = ({ navigation }) => {
         alert('Đăng ký thành công!');
         navigation.navigate('ConfirmOTP', { email });
       } else {
-        alert(res.message || "Đăng ký thất bại.");
+        alert(res.error || "Đăng ký thất bại.");
       }
     } catch (err) {
       console.error('Lỗi đăng ký:', err);

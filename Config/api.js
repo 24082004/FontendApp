@@ -44,6 +44,11 @@ export const API_CONFIG = {
     UPLOAD_AVATAR: `${CONFIG.API_BASE_URL}/user/upload-avatar`,
     CHANGE_PASSWORD: `${CONFIG.API_BASE_URL}/user/change-password`,
   },
+
+  MOVIE: {
+  LIST: `${CONFIG.API_BASE_URL}/movies`,               // Lấy danh sách phim đang chiếu
+  COMING_SOON: `${CONFIG.API_BASE_URL}/movies?status=coming-soon`, // Lấy danh sách phim sắp chiếu
+  },
   
   // Thêm các endpoints khác nếu cần
   // PRODUCT: {

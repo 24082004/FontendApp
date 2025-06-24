@@ -1,11 +1,31 @@
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 import { View, Text, StyleSheet, ScrollView, Image, TextInput, TouchableOpacity } from 'react-native';
+import MovieService from '../servicess/MovieService';
 
 export default function HomeScreen({ navigation }) {
+
+  const [nowShowing, setNowShowing] = useState([]);
+  const [comingSoon, setComingSoon] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const now = await MovieService.getNowShowing();
+        const soon = await MovieService.getComingSoon();
+        setNowShowing(now);
+        setComingSoon(comingSoon);
+      } catch (error) {
+        console.error('Lỗi khi tải phim', error);
+      }
+    };
+    fetchData();
+  }, []);
+
   return (
     <ScrollView style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.greeting}>Chào, Angelina</Text>
+        <Text style={styles.greeting}>Chào, Cinema</Text>
         <Text style={styles.welcome}>Chào mừng bạn quay lại</Text>
         <TextInput style={styles.search} placeholder="Tìm kiếm" placeholderTextColor="#999" />
       </View>
@@ -13,147 +33,50 @@ export default function HomeScreen({ navigation }) {
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Đang chiếu</Text>
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-          <TouchableOpacity
-            onPress={() => navigation.navigate('MovieDetail', {
-              title: 'Avengers - Cuộc Chiến Vô Cực',
-              duration: '2h 29p',
-              releaseDate: '16.12.2022',
-              genre: 'Hành động, Phiêu lưu, Khoa học viễn tưởng',
-              rating: 8.4,
-              votes: 1222,
-              image: require('../Asset/we.png'),
-            })}
-          >
-            <View style={styles.nowPlayingItem}>
-              <Image 
-                source={require('../Asset/we.png')} 
-                style={styles.nowPlayingPoster} 
-                resizeMode="cover" 
-              />
-              <Text style={styles.movieTitle}>Avengers - Cuộc Chiến Vô Cực</Text>
-              <Text style={styles.movieDetail}>2h 29p · Hành động, Phiêu lưu, Khoa học viễn tưởng</Text>
-              <Text style={styles.movieRating}>⭐ 8.4/10</Text>
-            </View>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            onPress={() => navigation.navigate('MovieDetail', {
-              title: 'Avatar 2',
-              duration: '3h 12p',
-              releaseDate: '20.12.2022',
-              genre: 'Hành động, Phiêu lưu, Khoa học viễn tưởng',
-              rating: 7.9,
-              votes: 1050,
-              image: require('../Asset/we.png'),
-            })}
-          >
-            <View style={styles.nowPlayingItem}>
-              <Image 
-                source={require('../assets/avatar2.png')} 
-                style={styles.nowPlayingPoster} 
-                resizeMode="cover" 
-              />
-              <Text style={styles.movieTitle}>Avatar 2</Text>
-              <Text style={styles.movieDetail}>3h 12p · Hành động, Phiêu lưu, Khoa học viễn tưởng</Text>
-              <Text style={styles.movieRating}>⭐ 7.9/10</Text>
-            </View>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            onPress={() => navigation.navigate('MovieDetail', {
-              title: 'Người Kiến',
-              duration: '2h 5p',
-              releaseDate: '10.01.2023',
-              genre: 'Hành động, Hài',
-              rating: 7.2,
-              votes: 900,
-              image: require('../Asset/we.png'),
-            })}
-          >
-            <View style={styles.nowPlayingItem}>
-              <Image 
-                source={require('../Asset/we.png')} 
-                style={styles.nowPlayingPoster} 
-                resizeMode="cover" 
-              />
-              <Text style={styles.movieTitle}>Người Kiến</Text>
-              <Text style={styles.movieDetail}>2h 5p · Hành động, Hài</Text>
-              <Text style={styles.movieRating}>⭐ 7.2/10</Text>
-            </View>
-          </TouchableOpacity>
+          {nowShowing.map((movie, index) => (
+            <TouchableOpacity
+              key={movie._id || index}
+              onPress={() =>
+                navigation.navigate('MovieDetail', {
+                  title: movie.name,
+                  duration: movie.durationFormatted || movie.duration,
+                  releaseDate: new Date(movie.release_date).toLocaleDateString('vi-VN'),
+                  genre: movie.genreNames?.join(', ') || 'Đang cập nhật',
+                  rating: movie.rate,
+                  image: { uri: movie.image },
+                })
+              }
+            >
+              <View style={styles.nowPlayingItem}>
+                <Image
+                  source={{ uri: movie.image }}
+                  style={styles.nowPlayingPoster}
+                  resizeMode="cover"
+                />
+                <Text style={styles.movieTitle}>{movie.name}</Text>
+                <Text style={styles.movieDetail}>
+                  {movie.durationFormatted || movie.duration} · {movie.genreNames?.join(', ') || '...'}
+                </Text>
+                <Text style={styles.movieRating}>⭐ {movie.rate}/10</Text>
+              </View>
+            </TouchableOpacity>
+          ))}
         </ScrollView>
       </View>
 
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Sắp chiếu</Text>
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-          {['Avatar 2', 'Người Kiến', 'Quantumania', 'The Flash', 'Transformers'].map((title, index) => (
-            <View key={index} style={styles.comingItem}>
-              <Image 
-                source={require('../Asset/we.png')} 
-                style={styles.comingPoster} 
+          {comingSoon.map((movie, index) => (
+            <View key={movie._id || index} style={styles.comingItem}>
+              <Image
+                source={{ uri: movie.image }}
+                style={styles.comingPoster}
                 resizeMode="cover"
               />
-              <Text style={styles.movieTitle}>{title}</Text>
+              <Text style={styles.movieTitle}>{movie.name}</Text>
             </View>
           ))}
-        </ScrollView>
-      </View>
-
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Khuyến mãi & Giảm giá</Text>
-        <Image 
-          source={require('../Asset/we.png')} 
-          style={styles.promo} 
-          resizeMode="cover"
-        />
-      </View>
-
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Dịch vụ</Text>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-          {['Bán lẻ', 'Imax', '4DX', 'Sweetbox'].map((name, index) => (
-            <View key={index} style={{ alignItems: 'center', marginRight: 10 }}>
-              <View style={styles.serviceItem}>
-                <Image 
-                  source={require('../Asset/we.png')} 
-                  style={styles.serviceIcon} 
-                  resizeMode="cover"
-                />
-              </View>
-              <Text style={styles.serviceText}>{name}</Text>
-            </View>
-          ))}
-        </ScrollView>
-      </View>
-
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Tin tức phim</Text>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-          <View style={styles.newsItem}>
-            <Image 
-              source={require('../assets/batman.png')} 
-              style={styles.newsImage}
-              resizeMode="cover"
-            />
-            <Text style={styles.newsText}>Thời gian quay The Batman 2 đã được tiết lộ</Text>
-          </View>
-          <View style={styles.newsItem}>
-            <Image 
-              source={require('../Asset/we.png')} 
-              style={styles.newsImage}
-              resizeMode="cover"
-            />
-            <Text style={styles.newsText}>6 trận chiến sử thi của Hulk có thể xảy ra trong MCU</Text>
-          </View>
-          <View style={styles.newsItem}>
-            <Image 
-              source={require('../Asset/we.png')} 
-              style={styles.newsImage}
-              resizeMode="cover"
-            />
-            <Text style={styles.newsText}>Câu chuyện mới về Người Nhện được Marvel công bố</Text>
-          </View>
         </ScrollView>
       </View>
 
@@ -232,38 +155,5 @@ const styles = StyleSheet.create({
     width: '100%',
     height: 100,
     borderRadius: 10,
-  },
-  serviceItem: {
-    backgroundColor: '#333',
-    borderRadius: 40,
-    width: 60,
-    height: 60,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  serviceIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-  },
-  serviceText: {
-    color: '#fff',
-    fontSize: 12,
-    textAlign: 'center',
-    marginTop: 5,
-  },
-  newsItem: {
-    width: 160,
-    marginRight: 10,
-  },
-  newsImage: {
-    width: '100%',
-    height: 90,
-    borderRadius: 8,
-    marginBottom: 5,
-  },
-  newsText: {
-    color: '#ccc',
-    fontSize: 12,
   },
 });

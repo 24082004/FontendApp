@@ -1,10 +1,36 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
+import React, { use, useState } from 'react';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { Ionicons, FontAwesome, AntDesign, Feather } from '@expo/vector-icons';
+import AuthService from '../Services/AuthService';
 
 const SignIn = ({navigation}) => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const handleLogin = async () => {
+    if (!email || !password) {
+      Alert.alert('Vui lòng nhập email và mật khẩu');
+      return;
+    } setLoading(true);
+    try {
+      const response = await AuthService.login(email, password);
+      if (response.success) {
+        navigation.reset({
+          index: 0,
+          routes: [{ name: 'MainTabs'}],
+        });
+      } else {
+        Alert.alert(response.message || 'Emai hoặc mật khẩu không đúng');
+      }
+    } catch (error) {
+      Alert.alert(error.error || 'Không thể kết nối đến server')
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -20,6 +46,8 @@ const SignIn = ({navigation}) => {
           placeholder="Nhập email"
           placeholderTextColor="#888"
           keyboardType="email-address"
+          value={email}
+          onChangeText={setEmail}
         />
       </View>
       <View style={styles.divider} />
@@ -30,6 +58,8 @@ const SignIn = ({navigation}) => {
           placeholder="Nhập mật khẩu"
           placeholderTextColor="#888"
           secureTextEntry={!showPassword}
+          value={password}
+          onChangeText={setPassword}
         />
         <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
           <Feather name={showPassword ? 'eye-off' : 'eye'} size={20} color="#888" />
@@ -46,8 +76,8 @@ const SignIn = ({navigation}) => {
         </TouchableOpacity>
       </View>
       <View/>
-      <TouchableOpacity style={styles.continueButton}>
-        <Text style={styles.continueText}>Đăng nhập</Text>
+      <TouchableOpacity style={styles.continueButton} onPress={handleLogin} disabled={loading}>
+        <Text style={styles.continueText}>{loading ? 'Đang đăng nhập...' : 'Đăng nhập'}</Text>
       </TouchableOpacity>
       <Text style={styles.terms}>
           Bằng việc đăng nhập hoặc đăng ký, bạn đồng ý với{' '}
