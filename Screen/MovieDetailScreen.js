@@ -10,6 +10,16 @@ import {
 } from 'react-native';
 
 const MovieDetailScreen = ({ route }) => {
+  const { movie } = route.params;
+
+  if (!movie) {
+    return (
+      <View style={styles.centered}>
+        <Text style={{ color: 'white' }}>Không tìm thấy thông tin phim.</Text>
+      </View>
+    );
+  }
+
   const {
     title,
     duration,
@@ -17,52 +27,44 @@ const MovieDetailScreen = ({ route }) => {
     genre,
     rating,
     votes,
-    image,
-  } = route.params;
+    posterUrl,
+    description,
+  } = movie;
 
   return (
     <ScrollView style={styles.container}>
-      <ImageBackground source={image} style={styles.backgroundImage}>
+      <ImageBackground source={{ uri: posterUrl }} style={styles.backgroundImage}>
         <View style={styles.overlayBox}>
           <Text style={styles.title}>{title}</Text>
-          <Text style={styles.subTitle}>
-            {duration} • {releaseDate}
-          </Text>
+          <Text style={styles.subTitle}>{duration} • {releaseDate}</Text>
+
           <View style={styles.reviewRow}>
             <Text style={styles.rating}>⭐ {rating}</Text>
-            <Text style={styles.reviewCount}>({votes})</Text>
+            <Text style={styles.reviewCount}>({votes || 0})</Text>
+
             <TouchableOpacity style={styles.trailerBtn}>
               <Text style={styles.trailerText}>▶ Xem trailer</Text>
             </TouchableOpacity>
           </View>
+
           <View style={styles.starRow}>
             {[...Array(5)].map((_, i) => (
-              <Text key={i} style={styles.star}>
-                ☆
-              </Text>
+              <Text key={i} style={styles.star}>☆</Text>
             ))}
           </View>
         </View>
       </ImageBackground>
 
       <View style={styles.section}>
-        <Text style={styles.label}>
-          Thể loại: <Text style={styles.bold}>{genre}</Text>
-        </Text>
-        <Text style={styles.label}>
-          Phân loại: <Text style={styles.bold}>13+</Text>
-        </Text>
-        <Text style={styles.label}>
-          Ngôn ngữ: <Text style={styles.bold}>Tiếng Anh</Text>
-        </Text>
+        <Text style={styles.label}>Thể loại: <Text style={styles.bold}>{genre}</Text></Text>
+        <Text style={styles.label}>Phân loại: <Text style={styles.bold}>13+</Text></Text>
+        <Text style={styles.label}>Ngôn ngữ: <Text style={styles.bold}>Tiếng Anh</Text></Text>
       </View>
 
       <View style={styles.section}>
         <Text style={styles.header}>Nội dung</Text>
         <Text style={styles.description}>
-          Avengers và các đồng minh của họ tiếp tục bảo vệ thế giới khỏi
-          những mối đe dọa quá lớn cho bất kỳ siêu anh hùng nào. Một mối
-          nguy hiểm mới đã xuất hiện từ bóng tối vũ trụ: Thanos... Xem thêm
+          {description || 'Đang cập nhật nội dung phim...'}
         </Text>
       </View>
 
@@ -76,6 +78,7 @@ const MovieDetailScreen = ({ route }) => {
             />
             <Text style={styles.personNameHorizontal}>Anthony Russo</Text>
           </View>
+
           <View style={styles.personBox}>
             <Image
               source={require('../Asset/joe.png')}
@@ -96,6 +99,7 @@ const MovieDetailScreen = ({ route }) => {
             />
             <Text style={styles.personNameHorizontal}>Robert Downey Jr.</Text>
           </View>
+
           <View style={styles.personBox}>
             <Image
               source={require('../Asset/chris_hemsworth.png')}
@@ -103,6 +107,7 @@ const MovieDetailScreen = ({ route }) => {
             />
             <Text style={styles.personNameHorizontal}>Chris Hemsworth</Text>
           </View>
+
           <View style={styles.personBox}>
             <Image
               source={require('../Asset/chris_evans.png')}
@@ -115,7 +120,6 @@ const MovieDetailScreen = ({ route }) => {
 
       <View style={styles.section}>
         <Text style={styles.header}>Rạp chiếu</Text>
-
         <View style={styles.cinemaBoxSelected}>
           <View style={{ flex: 1 }}>
             <Text style={styles.cinemaName}>Vincom Ocean Park CGV</Text>
@@ -123,34 +127,9 @@ const MovieDetailScreen = ({ route }) => {
               4.55 km | Đa Tốn, Gia Lâm, Hà Nội
             </Text>
           </View>
+
           <Image
             source={require('../Asset/cgv_logo.png')}
-            style={styles.logo}
-          />
-        </View>
-
-        <View style={styles.cinemaBox}>
-          <View style={{ flex: 1 }}>
-            <Text style={styles.cinemaName}>Aeon Mall CGV</Text>
-            <Text style={styles.cinemaDetail}>
-              9.32 km | 27 Cổ Linh, Long Biên, Hà Nội
-            </Text>
-          </View>
-          <Image
-            source={require('../Asset/cgv_logo.png')}
-            style={styles.logo}
-          />
-        </View>
-
-        <View style={styles.cinemaBox}>
-          <View style={{ flex: 1 }}>
-            <Text style={styles.cinemaName}>Lotte Cinema Long Biên</Text>
-            <Text style={styles.cinemaDetail}>
-              14.3 km | 7-9 Nguyễn Văn Linh, Long Biên, Hà Nội
-            </Text>
-          </View>
-          <Image
-            source={require('../Asset/lotte_logo.png')}
             style={styles.logo}
           />
         </View>
@@ -243,14 +222,6 @@ const styles = StyleSheet.create({
     color: '#ccc',
     fontSize: 13,
   },
-  cinemaBox: {
-    backgroundColor: '#2c2c2e',
-    padding: 12,
-    borderRadius: 12,
-    marginBottom: 12,
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
   cinemaBoxSelected: {
     backgroundColor: '#3a2c12',
     borderColor: '#ffc107',
@@ -307,6 +278,12 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 12,
     textAlign: 'center',
+  },
+  centered: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#000',
   },
 });
 
