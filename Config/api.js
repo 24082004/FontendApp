@@ -3,16 +3,16 @@
 // Cấu hình môi trường
 const ENVIRONMENTS = {
   development: {
-    API_BASE_URL: 'https://my-backend-api-movie.onrender.com/api',
+    API_BASE_URL: 'https://my-backend-api-movie.onrender.com/api', // IP máy local
     // API_BASE_URL: 'http://10.0.2.2:3000/api',   // Android Emulator
-    // API_BASE_URL: 'http://localhost:3000/api', // iOS Simulator
+    // API_BASE_URL: 'http://localhost:3000/api',   // iOS Simulator
   },
   staging: {
     API_BASE_URL: 'https://your-staging-api.com/api',
   },
   production: {
     API_BASE_URL: 'https://your-production-api.com/api',
-  },
+  }
 };
 
 // Chọn môi trường hiện tại
@@ -25,7 +25,7 @@ const CONFIG = ENVIRONMENTS[CURRENT_ENV];
 export const API_CONFIG = {
   BASE_URL: CONFIG.API_BASE_URL,
   TIMEOUT: 10000, // 10 seconds
-
+  
   // Auth endpoints
   AUTH: {
     REGISTER: `${CONFIG.API_BASE_URL}/auth/register`,
@@ -36,7 +36,7 @@ export const API_CONFIG = {
     VERIFY_EMAIL: `${CONFIG.API_BASE_URL}/auth/verify-email`,
     RESEND_OTP: `${CONFIG.API_BASE_URL}/auth/resend-otp`,
   },
-
+  
   // User endpoints
   USER: {
     PROFILE: `${CONFIG.API_BASE_URL}/user/profile`,
@@ -44,7 +44,6 @@ export const API_CONFIG = {
     UPLOAD_AVATAR: `${CONFIG.API_BASE_URL}/user/upload-avatar`,
     CHANGE_PASSWORD: `${CONFIG.API_BASE_URL}/user/change-password`,
   },
-
 
   MOVIE: {
   LIST: `${CONFIG.API_BASE_URL}/movies`,               // Lấy danh sách phim đang chiếu
@@ -56,14 +55,12 @@ export const API_CONFIG = {
   //   LIST: `${CONFIG.API_BASE_URL}/products`,
   //   DETAIL: (id) => `${CONFIG.API_BASE_URL}/products/${id}`,
   // }
-
-  
 };
 
 // Export default headers
 export const DEFAULT_HEADERS = {
   'Content-Type': 'application/json',
-  Accept: 'application/json',
+  'Accept': 'application/json',
 };
 
 // Export API status codes
