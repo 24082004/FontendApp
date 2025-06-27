@@ -13,17 +13,47 @@ class AuthService {
       };
 
       const response = await fetch(url, config);
-      const result = await response.json();
+      
+      // Parse response
+      let result;
+      const contentType = response.headers.get('content-type');
+      if (contentType && contentType.includes('application/json')) {
+        result = await response.json();
+      } else {
+        const text = await response.text();
+        result = { success: false, error: text || 'Invalid response format' };
+      }
+      
+      // Xử lý HTTP error codes
+      if (!response.ok) {
+        return {
+          success: false,
+          error: result.message || result.error || `HTTP ${response.status}: ${response.statusText}`,
+          statusCode: response.status,
+          ...result
+        };
+      }
       
       return {
         ...result,
         statusCode: response.status,
       };
     } catch (error) {
-      console.error('API Call Error:', error);
-      throw {
+      console.error('AuthService: API Call Error:', error);
+      
+      let errorMessage = 'Không thể kết nối đến server';
+      
+      if (error.name === 'TypeError' && error.message.includes('fetch')) {
+        errorMessage = 'Không có kết nối internet hoặc server không phản hồi';
+      } else if (error.name === 'AbortError') {
+        errorMessage = 'Yêu cầu bị hủy do timeout';
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
+      return {
         success: false,
-        error: 'Không thể kết nối đến server. Vui lòng kiểm tra kết nối mạng.',
+        error: errorMessage,
         originalError: error,
       };
     }
@@ -65,8 +95,14 @@ class AuthService {
       
       return result;
     } catch (error) {
-      console.error('Login error:', error);
-      throw error;
+      console.error('AuthService: Login error:', error);
+      
+      // Trả về error object thay vì throw để dễ xử lý
+      return {
+        success: false,
+        error: error.error || error.message || 'Lỗi kết nối mạng',
+        originalError: error
+      };
     }
   }
 
@@ -97,14 +133,13 @@ class AuthService {
   }
 
   // Xác thực OTP
-  async verifyOTP(email, otpCode, userData) {
+  async verifyOTP(email, otpCode) {
     try {
       const result = await this.apiCall(API_CONFIG.AUTH.VERIFY_EMAIL, {
         method: 'POST',
         body: JSON.stringify({ 
           email, 
-          otp: otpCode,
-          userData // Gửi thêm userData để hoàn tất đăng ký
+          otp: otpCode
         }),
       });
       
@@ -123,10 +158,15 @@ class AuthService {
   // Gửi lại OTP
   async resendOTP(email) {
     try {
-      return await this.apiCall(API_CONFIG.AUTH.RESEND_OTP, {
+      console.log('Sending resend OTP request for:', email);
+      const result = await this.apiCall(API_CONFIG.AUTH.RESEND_OTP, {
         method: 'POST',
         body: JSON.stringify({ email }),
       });
+      
+      console.log('Resend OTP response:', result);
+      
+      return result;
     } catch (error) {
       console.error('Resend OTP error:', error);
       throw error;

@@ -9,7 +9,7 @@ import {
   ImageBackground,
 } from 'react-native';
 
-const MovieDetailScreen = ({ route }) => {
+const MovieDetailScreen = ({ route, navigation }) => {
   const {
     title,
     duration,
@@ -156,7 +156,18 @@ const MovieDetailScreen = ({ route }) => {
         </View>
       </View>
 
-      <TouchableOpacity style={styles.continueBtn}>
+      <TouchableOpacity 
+        style={styles.continueBtn}
+        onPress={() => navigation.navigate('SelectSeat', {
+          movieTitle: title,
+          duration: duration,
+          releaseDate: releaseDate,
+          genre: genre,
+          rating: rating,
+          votes: votes,
+          image: image
+        })}
+      >
         <Text style={styles.continueText}>Tiếp tục</Text>
       </TouchableOpacity>
     </ScrollView>
