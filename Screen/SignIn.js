@@ -79,11 +79,6 @@ const SignIn = ({navigation}) => {
       <TouchableOpacity style={styles.continueButton} onPress={handleLogin} disabled={loading}>
         <Text style={styles.continueText}>{loading ? 'Đang đăng nhập...' : 'Đăng nhập'}</Text>
       </TouchableOpacity>
-      <Text style={styles.terms}>
-          Bằng việc đăng nhập hoặc đăng ký, bạn đồng ý với{' '}
-          <Text style={styles.link}>Điều khoản dịch vụ</Text> và{' '}
-          <Text style={styles.link}>Chính sách bảo mật </Text>của chúng tôi.
-      </Text>
     </View>
   );
 };
@@ -151,18 +146,6 @@ const styles = StyleSheet.create({
     color: 'black',
     fontWeight: '600',
     fontSize: 16,
-  },
-  terms: {
-    color: 'gray',
-    textAlign: 'center',
-    fontSize: 12,
-    position: 'absolute',
-    bottom: 20,
-    left: 20,
-    right: 20,
-  },
-  link: {
-    color: '#facc15',
   },
 });
 
