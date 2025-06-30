@@ -1,23 +1,53 @@
-import React, { useState } from 'react';
-import { View, Text, Image, StyleSheet, Switch, TouchableOpacity, SafeAreaView } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, Image, StyleSheet, Switch, TouchableOpacity, SafeAreaView, ActivityIndicator } from 'react-native';
 import Icon from 'react-native-vector-icons/Feather';
+import {getProfile} from '../Services/userService';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 
 const ProfileScreen = () => {
-  const [isFaceIDEnabled, setIsFaceIDEnabled] = useState(true);
+  // const [isFaceIDEnabled, setIsFaceIDEnabled] = useState(true);
 
-  const toggleSwitch = () => setIsFaceIDEnabled(previousState => !previousState);
+  // const toggleSwitch = () => setIsFaceIDEnabled(previousState => !previousState);
+
+  const [profile, setProfile] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const token = await AsyncStorage.getItem('userToken');
+      if (!token) {
+        console.warn('Chưa đăng nhập, không có token!');
+        setLoading(false);
+        return;
+      }
+        const data = await getProfile(token);
+        setProfile(data);
+        
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProfile();
+  }, []);
+
+  if (loading) return <ActivityIndicator size="large" color="#f4cf4e" />;
 
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.userInfo}>
         <Image
-          source={{ uri: 'https://i.pravatar.cc/150?img=47' }}
+          source={{ uri: profile.data.image || 'https://i.pravatar.cc/150' }}
           style={styles.avatar}
         />
         <View style={styles.userText}>
-          <Text style={styles.name}>Angelina</Text>
-          <Text style={styles.contact}>📞 (704) 555-0127</Text>
-          <Text style={styles.contact}>📧 angelina@example.com</Text>
+          <Text style={styles.name}>{profile.data.name}</Text>
+          <Text style={styles.contact}><Icon name="phone" size={20} color="#fff" /> {profile.data.number_phone}</Text>
+          <Text style={styles.contact}><Icon name="mail" size={20} color="#fff" /> {profile.data.email}</Text>
         </View>
         <TouchableOpacity>
           <Icon name="edit-3" size={20} color="#fff" />
