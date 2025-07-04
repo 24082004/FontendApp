@@ -13,9 +13,8 @@ const User = ({navigation}) => {
   const [username, setUsername] = useState('');
 
   const handleDone = () => {
-    // Xử lý khi nhấn nút Xong, ví dụ: xác thực username
     console.log('Tên người dùng:', username);
-    navigation.navigate('MainTabs');
+    navigation.navigate('SignIn');
   };
 
   return (
