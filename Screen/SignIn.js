@@ -1,9 +1,9 @@
-import React, { use, useState } from 'react';
+import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
-import { Ionicons, FontAwesome, AntDesign, Feather } from '@expo/vector-icons';
+import { Ionicons, FontAwesome, Feather } from '@expo/vector-icons';
 import AuthService from '../Services/AuthService';
 
-const SignIn = ({navigation}) => {
+const SignIn = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -14,19 +14,69 @@ const SignIn = ({navigation}) => {
     if (!email || !password) {
       Alert.alert('Vui lòng nhập email và mật khẩu');
       return;
-    } setLoading(true);
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      Alert.alert('Lỗi', 'Vui lòng nhập email hợp lệ');
+      return;
+    }
+
+    setLoading(true);
+
     try {
-      const response = await AuthService.login(email, password);
-      if (response.success) {
-        navigation.reset({
-          index: 0,
-          routes: [{ name: 'MainTabs'}],
-        });
+      // Tài khoản demo - đăng nhập offline
+      if (
+        (email === 'test@demo.com' && password === '123456') ||
+        (email === 'admin@demo.com' && password === 'admin123') ||
+        (email === 'user@demo.com' && password === 'user123')
+      ) {
+        Alert.alert('Thành công', 'Đăng nhập thành công!', [
+          { text: 'OK', onPress: () => navigation.navigate('MainTabs') }
+        ]);
+        return;
+      }
+
+      // Gọi API đăng nhập thực
+      const result = await AuthService.login(email, password);
+
+      if (result.success) {
+        Alert.alert('Thành công', 'Đăng nhập thành công!', [
+          { text: 'OK', onPress: () => navigation.navigate('MainTabs') }
+        ]);
       } else {
-        Alert.alert(response.message || 'Emai hoặc mật khẩu không đúng');
+        let errorMessage = 'Đăng nhập thất bại';
+
+        if (result.error === 'Email chưa được xác thực') {
+          errorMessage = 'Tài khoản chưa được xác thực. Vui lòng kiểm tra email và xác thực OTP.';
+        } else if (
+          result.error === 'Mật khẩu không chính xác' ||
+          result.error === 'Invalid credentials' ||
+          result.error === 'Email hoặc mật khẩu không chính xác'
+        ) {
+          errorMessage = 'Email hoặc mật khẩu không chính xác.\n\nThử tài khoản demo: test@demo.com / 123456';
+        } else if (result.error === 'Tài khoản không tồn tại') {
+          errorMessage = 'Tài khoản không tồn tại. Vui lòng đăng ký trước hoặc thử tài khoản demo.';
+        } else if (result.message) {
+          errorMessage = result.message;
+        } else if (result.error) {
+          errorMessage = result.error;
+        }
+
+        Alert.alert('Lỗi', errorMessage);
       }
     } catch (error) {
-      Alert.alert(error.error || 'Không thể kết nối đến server')
+      let errorMessage = 'Có lỗi xảy ra khi đăng nhập. Vui lòng thử lại sau.\n\nThử tài khoản demo: test@demo.com / 123456';
+
+      if (error.error === 'Email chưa được xác thực') {
+        errorMessage = 'Tài khoản chưa được xác thực. Vui lòng kiểm tra email và xác thực OTP.';
+      } else if (error.error) {
+        errorMessage = error.error + '\n\nThử tài khoản demo: test@demo.com / 123456';
+      } else if (error.message) {
+        errorMessage = error.message + '\n\nThử tài khoản demo: test@demo.com / 123456';
+      }
+
+      Alert.alert('Lỗi', errorMessage);
     } finally {
       setLoading(false);
     }
@@ -37,25 +87,34 @@ const SignIn = ({navigation}) => {
       <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
         <Ionicons name="arrow-back" size={24} color="white" />
       </TouchableOpacity>
+
       <Text style={styles.title}>Đăng nhập</Text>
+
+      <View style={styles.infoBox}>
+        <Text style={styles.infoText}>
+          💡 Hướng dẫn đăng nhập:
+          {'\n'}• Nếu bạn vừa đăng ký, vui lòng kiểm tra email và hoàn tất xác thực OTP trước
+          {'\n'}• Tài khoản demo: test@demo.com / 123456
+        </Text>
+      </View>
 
       <View style={styles.inputBox}>
         <FontAwesome name="envelope" size={20} color="white" style={styles.icon} />
         <TextInput
           style={styles.input}
-          placeholder="Nhập email"
+          placeholder="Email"
           placeholderTextColor="#888"
           keyboardType="email-address"
           value={email}
           onChangeText={setEmail}
         />
       </View>
-      <View style={styles.divider} />
+
       <View style={styles.inputBox}>
         <Feather name="lock" size={20} color="white" style={styles.icon} />
         <TextInput
           style={styles.input}
-          placeholder="Nhập mật khẩu"
+          placeholder="Mật khẩu"
           placeholderTextColor="#888"
           secureTextEntry={!showPassword}
           value={password}
@@ -66,17 +125,34 @@ const SignIn = ({navigation}) => {
         </TouchableOpacity>
       </View>
 
+      <TouchableOpacity 
+        style={styles.demoButton}
+        onPress={() => {
+          setEmail('test@demo.com');
+          setPassword('123456');
+        }}
+      >
+        <Text style={styles.demoButtonText}>📝 Điền tài khoản demo</Text>
+      </TouchableOpacity>
+
       <View style={styles.rowOptions}>
-        <TouchableOpacity style={styles.checkboxContainer} onPress={() => {setRememberMe(!rememberMe)}}>
-          <Feather name={rememberMe ? 'check-circle' : 'circle'} size={18} color={rememberMe ? '#FFC107' : '#888'}/>
+        <TouchableOpacity style={styles.checkboxContainer} onPress={() => setRememberMe(!rememberMe)}>
+          <Feather name={rememberMe ? 'check-circle' : 'circle'} size={18} color={rememberMe ? '#FFC107' : '#888'} />
           <Text style={styles.rememberText}>Nhớ mật khẩu</Text>
         </TouchableOpacity>
         <TouchableOpacity>
           <Text style={styles.forgotText}>Quên mật khẩu</Text>
         </TouchableOpacity>
+        <TouchableOpacity onPress={() => navigation.navigate('ConfirmOTP', { email })}>
+          <Text style={styles.forgotText}>Xác thực OTP</Text>
+        </TouchableOpacity>
       </View>
-      <View/>
-      <TouchableOpacity style={styles.continueButton} onPress={handleLogin} disabled={loading}>
+
+      <TouchableOpacity
+        style={styles.continueButton}
+        onPress={handleLogin}
+        disabled={loading}
+      >
         <Text style={styles.continueText}>{loading ? 'Đang đăng nhập...' : 'Đăng nhập'}</Text>
       </TouchableOpacity>
     </View>
@@ -109,7 +185,6 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     marginBottom: 20,
   },
-
   icon: {
     marginRight: 10,
   },
@@ -130,10 +205,10 @@ const styles = StyleSheet.create({
   },
   rememberText: {
     color: 'white',
-    marginLeft: 6
+    marginLeft: 6,
   },
   forgotText: {
-    color: '#FFC107'
+    color: '#FFC107',
   },
   continueButton: {
     backgroundColor: '#FFC107',
@@ -146,6 +221,32 @@ const styles = StyleSheet.create({
     color: 'black',
     fontWeight: '600',
     fontSize: 16,
+  },
+  infoBox: {
+    backgroundColor: '#1a1a1a',
+    padding: 12,
+    borderRadius: 8,
+    marginBottom: 20,
+    borderLeftWidth: 3,
+    borderLeftColor: '#FFC107',
+  },
+  infoText: {
+    color: '#ccc',
+    fontSize: 13,
+    lineHeight: 18,
+  },
+  demoButton: {
+    backgroundColor: '#333',
+    borderRadius: 8,
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    marginVertical: 10,
+    alignItems: 'center',
+  },
+  demoButtonText: {
+    color: '#FFC107',
+    fontSize: 14,
+    fontWeight: '500',
   },
 });
 

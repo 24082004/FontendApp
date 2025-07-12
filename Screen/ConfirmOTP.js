@@ -1,13 +1,63 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, KeyboardAvoidingView, Platform } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  KeyboardAvoidingView,
+  Platform,
+  Alert,
+} from 'react-native';
 import AuthService from '../Services/AuthService';
 
-const ConfirmOTP = ({navigation, route}) => {
+const ConfirmOTP = ({ navigation, route }) => {
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
-  const [timer, setTimer] = useState(60);
+  const [timer, setTimer] = useState(59);
+  const [loading, setLoading] = useState(false);
   const inputs = [];
 
-  const email = route.params?.email;
+  const { email, testOTP, emailSendingFailed } = route.params || {};
+  const canResendImmediately = emailSendingFailed || testOTP;
+
+  useEffect(() => {
+    if (testOTP && emailSendingFailed) {
+      Alert.alert(
+        '📧 Lỗi gửi email',
+        `Có lỗi khi gửi email OTP.\n\nOTP test cho dev: ${testOTP}\n\nBạn có thể sử dụng mã này để tiếp tục hoặc thử gửi lại email.`,
+        [
+          { text: 'OK', style: 'default' },
+          {
+            text: 'Điền OTP test',
+            onPress: () => {
+              const otpArray = testOTP.toString().split('').slice(0, 6);
+              while (otpArray.length < 6) otpArray.push('');
+              setOtp(otpArray);
+            },
+          },
+        ]
+      );
+    }
+  }, [testOTP, emailSendingFailed]);
+
+  useEffect(() => {
+    if (canResendImmediately) {
+      setTimer(0);
+      return;
+    }
+
+    const interval = setInterval(() => {
+      setTimer((prev) => {
+        if (prev <= 1) {
+          clearInterval(interval);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [canResendImmediately]);
 
   const handleChange = (text, index) => {
     const newOtp = [...otp];
@@ -19,22 +69,72 @@ const ConfirmOTP = ({navigation, route}) => {
     }
   };
 
-  const handleVeriOTP = async () => {
+  const handleVerifyOTP = async () => {
     const otpCode = otp.join('');
-    if(otpCode.length !== 6){
-      alert("Bạn phải nhập đủ 6 chữ số OTP");
+    if (otpCode.length !== 6) {
+      Alert.alert('Lỗi', 'Vui lòng nhập đầy đủ mã OTP');
       return;
-    } try {
-      const res = await AuthService.verifyOTP(email, otpCode);
-      if(res.success){
-        alert("Xác thực OTP thành công");
-        navigation.navigate('User');
-      } else{
-        alert(res.error || "Xác thực OTP thất bại");
+    }
+
+    setLoading(true);
+    try {
+      const result = await AuthService.verifyOTP(email, otpCode);
+      if (result.success) {
+        Alert.alert('Thành công', 'Xác thực thành công!', [
+          {
+            text: 'OK',
+            onPress: () => navigation.navigate('MainTabs'),
+          },
+        ]);
+      } else {
+        Alert.alert('Lỗi', result.message || 'Mã OTP không chính xác');
       }
-    } catch(err){
-      console.log("OTP error:", err);
-      alert(err.error || "Có lỗi xảy ra khi xác thực OTP")
+    } catch (error) {
+      console.error('OTP verification error:', error);
+      Alert.alert('Lỗi', error.error || 'Có lỗi xảy ra khi xác thực OTP');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleResendOTP = async () => {
+    if (!canResendImmediately && timer > 0) return;
+
+    try {
+      const result = await AuthService.resendOTP(email);
+
+      if (result.success) {
+        if (!result.testOTP) {
+          setTimer(59);
+        } else {
+          setTimer(0);
+        }
+
+        if (result.testOTP) {
+          Alert.alert(
+            'Gửi lại thành công',
+            `Mã OTP mới đã được tạo.\n\nDo lỗi gửi email, bạn có thể sử dụng OTP test: ${result.testOTP}`,
+            [
+              { text: 'OK', style: 'default' },
+              {
+                text: 'Sử dụng OTP test',
+                onPress: () => {
+                  const otpArray = result.testOTP.toString().split('').slice(0, 6);
+                  while (otpArray.length < 6) otpArray.push('');
+                  setOtp(otpArray);
+                },
+              },
+            ]
+          );
+        } else {
+          Alert.alert('Thành công', 'Mã OTP mới đã được gửi đến email của bạn.');
+        }
+      } else {
+        Alert.alert('Lỗi', result.message || 'Không thể gửi lại OTP.');
+      }
+    } catch (error) {
+      console.error('Resend OTP error:', error);
+      Alert.alert('Lỗi', 'Có lỗi xảy ra khi gửi lại OTP.');
     }
   };
 
@@ -43,13 +143,13 @@ const ConfirmOTP = ({navigation, route}) => {
       style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
-      <TouchableOpacity style={styles.backButton} onPress={()=> navigation.goBack()}>
+      <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
         <Text style={styles.backText}>←</Text>
       </TouchableOpacity>
 
       <Text style={styles.title}>Xác thực OTP</Text>
       <Text style={styles.subtitle}>
-        Mã OTP đã được gửi đến email: {email}
+        Mã OTP đã được gửi đến email: {email || 'đã đăng ký'}
       </Text>
 
       <View style={styles.otpContainer}>
@@ -66,10 +166,28 @@ const ConfirmOTP = ({navigation, route}) => {
         ))}
       </View>
 
-      <Text style={styles.timer}>00:{timer.toString().padStart(2, '0')}</Text>
+      <Text style={styles.timer}>
+        {canResendImmediately ? 'Có thể gửi lại ngay' : `00:${timer.toString().padStart(2, '0')}`}
+      </Text>
 
-      <TouchableOpacity style={styles.continueButton} onPress={handleVeriOTP}>
-        <Text style={styles.continueText}>Tiếp tục</Text>
+      <TouchableOpacity
+        onPress={handleResendOTP}
+        disabled={!canResendImmediately && timer > 0}
+        style={[styles.resendButton, (!canResendImmediately && timer > 0) && styles.disabledButton]}
+      >
+        <Text style={[styles.resendText, (!canResendImmediately && timer > 0) && styles.disabledText]}>
+          {canResendImmediately ? 'Gửi lại mã OTP' : (timer > 0 ? `Gửi lại sau ${timer}s` : 'Gửi lại mã OTP')}
+        </Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        style={styles.continueButton}
+        onPress={handleVerifyOTP}
+        disabled={loading}
+      >
+        <Text style={styles.continueText}>
+          {loading ? 'Đang xác thực...' : 'Xác nhận'}
+        </Text>
       </TouchableOpacity>
     </KeyboardAvoidingView>
   );
@@ -129,6 +247,29 @@ const styles = StyleSheet.create({
     color: '#000',
     fontWeight: 'bold',
     fontSize: 16,
+  },
+  resendText: {
+    color: '#FFC107',
+    textAlign: 'center',
+    textDecorationLine: 'underline',
+    fontSize: 14,
+    fontWeight: '500',
+  },
+  resendButton: {
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 20,
+    backgroundColor: 'transparent',
+    borderWidth: 1,
+    borderColor: '#FFC107',
+    marginBottom: 20,
+    alignItems: 'center',
+  },
+  disabledButton: {
+    borderColor: '#666',
+  },
+  disabledText: {
+    color: '#666',
   },
 });
 
