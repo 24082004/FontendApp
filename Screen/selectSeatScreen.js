@@ -5,10 +5,56 @@ const seatRows = ['A','B','C','D','E','F','G','H','I','J'];
 const seatCols = [1,2,3,4,5,6,7,8,9];
 const reservedSeats = ['D6','D7','D8','D9','E5','E6','E7','E8','E9'];
 
-export default function SelectSeatScreen() {
-  const [selectedSeats, setSelectedSeats] = useState(['H7', 'H8']);
+export default function SelectSeatScreen({ route, navigation }) {
+  const [selectedSeats, setSelectedSeats] = useState([]);
   const [selectedDate, setSelectedDate] = useState('Dec 10');
   const [selectedTime, setSelectedTime] = useState('14:15');
+
+  // Nhận dữ liệu từ màn hình chi tiết phim
+  const movieData = route?.params || {};
+  const {
+    movieTitle = 'Phim',
+    duration = '',
+    releaseDate = '',
+    genre = '',
+    rating = '',
+    votes = '',
+    image = null
+  } = movieData;
+
+  const handleBuyTicket = () => {
+    if (selectedSeats.length === 0) {
+      // Import Alert nếu chưa có
+      const { Alert } = require('react-native');
+      Alert.alert('Chưa chọn ghế', 'Vui lòng chọn ít nhất một ghế để tiếp tục!');
+      return;
+    }
+
+    // Chuẩn bị dữ liệu cho màn hình thanh toán
+    const paymentData = {
+      // Thông tin phim
+      movieTitle,
+      duration,
+      releaseDate,
+      genre,
+      rating,
+      votes,
+      image,
+      
+      // Thông tin đặt vé
+      selectedSeats,
+      selectedDate,
+      selectedTime,
+      seatPrice,
+      totalPrice,
+      
+      // Thông tin rạp (có thể thêm sau)
+      cinema: 'Vincom Ocean Park CGV',
+      cinemaAddress: 'Đa Tốn, Gia Lâm, Hà Nội'
+    };
+
+    navigation.navigate('PaymentScreen', paymentData);
+  };
 
   const toggleSeat = (seat) => {
     if (reservedSeats.includes(seat)) return;
@@ -26,6 +72,7 @@ export default function SelectSeatScreen() {
   return (
     <ScrollView style={styles.container}>
       <Text style={styles.title}>Chọn ghế ngồi</Text>
+      <Text style={styles.movieTitle}>{movieTitle}</Text>
 
       <View style={styles.seatMap}>
         {seatRows.map(row => (
@@ -82,7 +129,7 @@ export default function SelectSeatScreen() {
 
       <View style={styles.footer}>
         <Text style={styles.total}>Tổng cộng{"\n"}<Text style={styles.totalPrice}>{totalPrice.toLocaleString()} VND</Text></Text>
-        <TouchableOpacity style={styles.buyButton}>
+        <TouchableOpacity style={styles.buyButton} onPress={handleBuyTicket}>
           <Text style={styles.buyText}>Mua vé</Text>
         </TouchableOpacity>
       </View>
@@ -109,7 +156,13 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: '600',
     color: '#fff',
+    marginBottom: 8,
+  },
+  movieTitle: {
+    fontSize: 16,
+    color: '#FDC536',
     marginBottom: 16,
+    textAlign: 'center',
   },
   seatMap: {
     marginBottom: 12,

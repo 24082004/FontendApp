@@ -15,7 +15,58 @@ const SignUp = ({ navigation }) => {
   const [gender, setGender] = useState('');
   const [agree, setAgree] = useState(false);
 
+  const validateEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
+  const validatePhone = (phone) => {
+    const phoneRegex = /^[0-9]{10,11}$/;
+    return phoneRegex.test(phone);
+  };
+
   const handleRegister = async () => {
+    // Validation
+    if (!username.trim()) {
+      alert("Vui lòng nhập họ tên.");
+      return;
+    }
+
+    if (!email.trim()) {
+      alert("Vui lòng nhập email.");
+      return;
+    }
+
+    if (!validateEmail(email)) {
+      alert("Email không hợp lệ. Vui lòng nhập đúng định dạng email.");
+      return;
+    }
+
+    if (!phone.trim()) {
+      alert("Vui lòng nhập số điện thoại.");
+      return;
+    }
+
+    if (!validatePhone(phone)) {
+      alert("Số điện thoại không hợp lệ. Vui lòng nhập 10-11 chữ số.");
+      return;
+    }
+
+    if (!password.trim()) {
+      alert("Vui lòng nhập mật khẩu.");
+      return;
+    }
+
+    if (password.length < 6) {
+      alert("Mật khẩu phải có ít nhất 6 ký tự.");
+      return;
+    }
+
+    if (!gender) {
+      alert("Vui lòng chọn giới tính.");
+      return;
+    }
+
     if (!agree) {
       alert("Bạn cần chấp nhận các quyền riêng tư.");
       return;
@@ -36,13 +87,48 @@ const SignUp = ({ navigation }) => {
 
       if (res.success) {
         alert('Đăng ký thành công!');
-        navigation.navigate('ConfirmOTP', { email });
+        // Kiểm tra xem có cần xác thực OTP không
+        if (res.requireOTP !== false) {
+          // Truyền thêm thông tin về testOTP và trạng thái gửi email
+          const otpParams = { 
+            email,
+            testOTP: res.testOTP,
+            emailSendingFailed: res.warning === "Email sending failed" || res.message?.includes("lỗi gửi email")
+          };
+          navigation.navigate('ConfirmOTP', otpParams);
+        } else {
+          // Nếu không cần OTP, chuyển thẳng đến trang chính
+          navigation.navigate('MainTabs');
+        }
       } else {
         alert(res.error || "Đăng ký thất bại.");
+        // Xử lý các loại lỗi cụ thể
+        let errorMessage = "Đăng ký thất bại.";
+        
+        if (res.error === "Email đã được đăng ký") {
+          errorMessage = "Email này đã được sử dụng. Vui lòng sử dụng email khác hoặc đăng nhập.";
+        } else if (res.error === "Số điện thoại đã được đăng ký") {
+          errorMessage = "Số điện thoại này đã được sử dụng. Vui lòng sử dụng số điện thoại khác.";
+        } else if (res.message) {
+          errorMessage = res.message;
+        } else if (res.error) {
+          errorMessage = res.error;
+        }
+        
+        alert(errorMessage);
       }
     } catch (err) {
       console.error('Lỗi đăng ký:', err);
-      alert(err.error || "Có lỗi xảy ra khi đăng ký.");
+      
+      let errorMessage = "Có lỗi xảy ra khi đăng ký.";
+      
+      if (err.error === "Email đã được đăng ký") {
+        errorMessage = "Email này đã được sử dụng. Vui lòng sử dụng email khác hoặc đăng nhập.";
+      } else if (err.error) {
+        errorMessage = err.error;
+      }
+      
+      alert(errorMessage);
     }
   };
 
@@ -97,6 +183,19 @@ const SignUp = ({ navigation }) => {
       <TouchableOpacity style={styles.registerButton} onPress={handleRegister}>
         <Text style={styles.registerText}>Tiếp tục</Text>
       </TouchableOpacity>
+
+      <View style={styles.loginContainer}>
+        <Text style={styles.loginText}>Đã có tài khoản? </Text>
+        <TouchableOpacity onPress={() => navigation.navigate('SignIn')}>
+          <Text style={styles.loginLink}>Đăng nhập ngay</Text>
+        </TouchableOpacity>
+      </View>
+
+      <Text style={styles.terms}>
+        Bằng việc đăng nhập hoặc đăng ký, bạn đồng ý với{' '}
+        <Text style={styles.link}>Điều khoản dịch vụ</Text> và{' '}
+        <Text style={styles.link}>Chính sách bảo mật</Text> của chúng tôi.
+      </Text>
     </View>
   );
 };
@@ -135,6 +234,32 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   registerText: { color: 'black', fontWeight: 'bold', fontSize: 16 },
+  loginContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 20,
+    marginBottom: 20,
+  },
+  loginText: {
+    color: '#ccc',
+    fontSize: 14,
+  },
+  loginLink: {
+    color: '#FFC107',
+    fontSize: 14,
+    fontWeight: 'bold',
+  },
+  terms: {
+    color: 'gray',
+    textAlign: 'center',
+    fontSize: 12,
+    position: 'absolute',
+    bottom: 20,
+    left: 20,
+    right: 20,
+  },
+  link: { color: '#facc15' },
 });
 
 export default SignUp;
