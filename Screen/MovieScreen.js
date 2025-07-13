@@ -1,69 +1,35 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
-  View, Text, TouchableOpacity, FlatList, Image, StyleSheet
+  View, Text, TouchableOpacity, FlatList, Image, StyleSheet, ActivityIndicator
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
-
-const nowPlayingMovies = [
-  {
-    id: '1',
-    title: 'Shang-Chi: Legend of the Ten Rings',
-    rating: '4.0 (982)',
-    duration: '2 hour 5 minutes',
-    genres: 'Action, Sci-fi',
-    image: require('../assets/shangchi.png'),
-  },
-  {
-    id: '2',
-    title: 'Batman v Superman: Dawn of Justice',
-    rating: '4.0 (982)',
-    duration: '2 hour 10 minutes',
-    genres: 'Action, Sci-fi',
-    image: require('../assets/batman.png'),
-  },
-  {
-    id: '3',
-    title: 'Avengers: Infinity War',
-    rating: '4.5 (1000)',
-    duration: '2 hour 29 minutes',
-    genres: 'Action, Sci-fi',
-    image: require('../assets/avengers.png'),
-  },
-  {
-    id: '4',
-    title: 'Guardians of the Galaxy',
-    rating: '4.2 (900)',
-    duration: '2 hour',
-    genres: 'Action, Sci-fi',
-    image: require('../assets/guardians.png'),
-  },
-];
+import { getNowPlayingMovies } from '../Services/movieScreenService';
 
 const comingSoonMovies = [
   {
-    id: '5',
-    title: 'Avatar 2: The Way Of Water',
+    _id: '5',
+    name: 'Avatar 2: The Way Of Water',
     date: '20.12.2022',
     genres: 'Adventure, Sci-fi',
     image: require('../assets/avatar2.png'),
   },
   {
-    id: '6',
-    title: 'Ant Man Wasp: Quantumania',
+    _id: '6',
+    name: 'Ant Man Wasp: Quantumania',
     date: '25.12.2022',
     genres: 'Adventure, Sci-fi',
     image: require('../assets/antman.png'),
   },
   {
-    id: '7',
-    title: 'Shazam!',
+    _id: '7',
+    name: 'Shazam!',
     date: '17.03.2023',
     genres: 'Action, Fantasy',
     image: require('../assets/shazam.png'),
   },
   {
-    id: '8',
-    title: 'Puss in Boots 2',
+    _id: '8',
+    name: 'Puss in Boots 2',
     date: '22.12.2022',
     genres: 'Animation, Comedy',
     image: require('../assets/puss.png'),
@@ -72,31 +38,68 @@ const comingSoonMovies = [
 
 const MovieScreen = () => {
   const [activeTab, setActiveTab] = useState('Now playing');
-  const movies = activeTab === 'Now playing' ? nowPlayingMovies : comingSoonMovies;
+  const [movies, setMovies] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const renderMovie = ({ item }) => (
-    <View style={styles.movieCard}>
-      <Image source={item.image} style={styles.poster} />
-      <Text style={styles.title}>{item.title}</Text>
+  const fetchMovies = async () => {
+    setLoading(true);
+    try {
+      if (activeTab === 'Now playing') {
+        const data = await getNowPlayingMovies();
+        //console.log("check data >>", data);
+        setMovies(data.data);
+      } else {
+        setMovies(comingSoonMovies);
+      }
+    } catch (error) {
+      console.error('Failed to fetch movies', error);
+    }
+    setLoading(false);
+  };
 
-      {activeTab === 'Now playing' ? (
-        <>
-          <View style={styles.row}>
-            <Icon name="star" size={14} color="#FFD700" />
-            <Text style={styles.rating}>{item.rating}</Text>
-          </View>
-          <Text style={styles.duration}>{item.duration}</Text>
-        </>
-      ) : (
-        <Text style={styles.date}>{item.date}</Text>
-      )}
+  useEffect(() => {
+    fetchMovies();
+  }, [activeTab]);
 
-      <View style={styles.genreRow}>
-        <Icon name="film-outline" size={14} color="gray" />
-        <Text style={styles.genres}>{item.genres}</Text>
+  const renderMovie = ({ item }) => {
+    const isAPI = typeof item.image === 'string';
+
+    const imageSource = isAPI
+      ? { uri: item.image }
+      : item.image;
+
+    const title = item.title || item.name;
+    const rating = item.rating || item.rate || 'N/A';
+    const duration = item.duration || item.durationFormatted || '';
+    const date = item.date || (item.release_date ? new Date(item.release_date).toLocaleDateString('vi-VN') : '');
+    const genres = Array.isArray(item.genreNames)
+      ? item.genreNames.join(', ')
+      : item.genres || '';
+
+    return (
+      <View style={styles.movieCard}>
+        <Image source={imageSource} style={styles.poster} />
+        <Text style={styles.title}>{title}</Text>
+
+        {activeTab === 'Now playing' ? (
+          <>
+            <View style={styles.row}>
+              <Icon name="star" size={14} color="#FFD700" />
+              <Text style={styles.rating}>{rating}</Text>
+            </View>
+            <Text style={styles.duration}>{duration}</Text>
+          </>
+        ) : (
+          <Text style={styles.date}>{date}</Text>
+        )}
+
+        <View style={styles.genreRow}>
+          <Icon name="film-outline" size={14} color="gray" />
+          <Text style={styles.genres}>{genres}</Text>
+        </View>
       </View>
-    </View>
-  );
+    );
+  };
 
   return (
     <View style={styles.container}>
@@ -119,13 +122,17 @@ const MovieScreen = () => {
         </TouchableOpacity>
       </View>
 
-      <FlatList
-        data={movies}
-        renderItem={renderMovie}
-        keyExtractor={(item) => item.id}
-        numColumns={2}
-        contentContainerStyle={styles.movieList}
-      />
+      {loading ? (
+        <ActivityIndicator size="large" color="#FFD700" style={{ marginTop: 20 }} />
+      ) : (
+        <FlatList
+          data={movies}
+          renderItem={renderMovie}
+          keyExtractor={(item) => item._id?.toString() || item.id?.toString()}
+          numColumns={2}
+          contentContainerStyle={styles.movieList}
+        />
+      )}
     </View>
   );
 };
