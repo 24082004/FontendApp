@@ -34,7 +34,7 @@ const WelcomeScreen = ({navigation}) => {
         <View style={styles.dot} />
       </View>
       <View style={styles.buttonWrapper}>
-        <TouchableOpacity style={styles.signInBtn} onPress={() => navigation.navigate('SignIn')}>
+        <TouchableOpacity style={styles.signInBtn} onPress={() => navigation.navigate('LogIn')}>
           <Text style={styles.signInText}>Đăng nhập</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.signUpBtn} onPress={() => navigation.navigate('SignUp')}>

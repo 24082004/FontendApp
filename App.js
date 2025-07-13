@@ -4,7 +4,7 @@ import { StyleSheet } from 'react-native';
 
 import WelcomeScreen from './Screen/Welcome';
 import SignUp from './Screen/SignUp';
-import SignIn from './Screen/SignIn';
+import LogIn from './Screen/LogIn';
 import ConfirmOTP from './Screen/ConfirmOTP';
 import User from "./Screen/User";
 import HomeScreen from './Screen/HomeScreen';
@@ -68,7 +68,7 @@ export default function App() {
     <NavigationContainer>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
         <Stack.Screen name="Welcome" component={WelcomeScreen} />
-        <Stack.Screen name="SignIn" component={SignIn} />
+        <Stack.Screen name="LogIn" component={LogIn} />
         <Stack.Screen name="SignUp" component={SignUp} />
         <Stack.Screen name="ConfirmOTP" component={ConfirmOTP} />
         <Stack.Screen name="User" component={User} />
