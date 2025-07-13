@@ -46,8 +46,16 @@ export const API_CONFIG = {
   },
 
   MOVIE: {
-  LIST: `${CONFIG.API_BASE_URL}/movies`,               // Lấy danh sách phim đang chiếu
-  COMING_SOON: `${CONFIG.API_BASE_URL}/movies?status=coming-soon`, // Lấy danh sách phim sắp chiếu
+  LIST: `${CONFIG.API_BASE_URL}/movies`,
+    DETAIL: (id) => `${CONFIG.API_BASE_URL}/movies/${id}`,
+    SEARCH: `${CONFIG.API_BASE_URL}/movies/search`,
+    BY_GENRE: (genreId) => `${CONFIG.API_BASE_URL}/movies?genre=${genreId}`,
+    BY_DIRECTOR: (directorId) => `${CONFIG.API_BASE_URL}/movies?director=${directorId}`,
+    BY_ACTOR: (actorId) => `${CONFIG.API_BASE_URL}/movies?actor=${actorId}`,
+    NOW_SHOWING: `${CONFIG.API_BASE_URL}/movies?status=now-showing`,
+    COMING_SOON: `${CONFIG.API_BASE_URL}/movies?status=coming-soon`,
+    POPULAR: `${CONFIG.API_BASE_URL}/movies?sort=-rate&limit=10`,
+    LATEST: `${CONFIG.API_BASE_URL}/movies?sort=-release_date&limit=10`,
   },
   
   // Thêm các endpoints khác nếu cần

@@ -25,7 +25,6 @@ const SignIn = ({ navigation }) => {
     setLoading(true);
 
     try {
-      // Tài khoản demo - đăng nhập offline
       if (
         (email === 'test@demo.com' && password === '123456') ||
         (email === 'admin@demo.com' && password === 'admin123') ||
@@ -37,7 +36,6 @@ const SignIn = ({ navigation }) => {
         return;
       }
 
-      // Gọi API đăng nhập thực
       const result = await AuthService.login(email, password);
 
       if (result.success) {
