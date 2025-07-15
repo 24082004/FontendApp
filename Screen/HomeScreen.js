@@ -51,6 +51,7 @@ export default function HomeScreen({ navigation }) {
               onPress={() =>
                 navigation.navigate('MovieDetail', {
                   movie: {
+                    _id: movie._id,
                     title: movie.name,
                     duration: movie.durationFormatted || movie.duration,
                     releaseDate: new Date(movie.release_date).toLocaleDateString('vi-VN'),
