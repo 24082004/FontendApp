@@ -61,12 +61,10 @@ const PaymentScreen = ({ route, navigation }) => {
         <Text style={styles.total}>Total <Text style={{ color: '#FFD700' }}>{totalPrice.toLocaleString()} VND</Text></Text>
 
         <Text style={styles.label}>Payment Method</Text>
-
-        {/* Payment at Counter */}
         <TouchableOpacity
           style={[styles.paymentMethod, styles.selectedMethod]}
           onPress={() => {
-            navigation.navigate('TicketScreen', {
+            navigation.navigate('MyTicket', {
               movieTitle,
               selectedSeats,
               selectedDate,

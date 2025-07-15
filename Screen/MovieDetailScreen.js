@@ -71,52 +71,34 @@ const MovieDetailScreen = ({ route, navigation }) => {
       <View style={styles.section}>
         <Text style={styles.header}>Đạo diễn</Text>
         <View style={styles.personRowHorizontal}>
-          <View style={styles.personBox}>
-            <Image
-              source={require('../Asset/anthony.png')}
-              style={styles.personImageHorizontal}
-            />
-            <Text style={styles.personNameHorizontal}>Anthony Russo</Text>
-          </View>
-
-          <View style={styles.personBox}>
-            <Image
-              source={require('../Asset/joe.png')}
-              style={styles.personImageHorizontal}
-            />
-            <Text style={styles.personNameHorizontal}>Joe Russo</Text>
-          </View>
+          {(Array.isArray(movie.director) ? movie.director : [movie.director]).map((name, index) => (
+            <View style={styles.personBox} key={index}>
+              <Image
+                source={{ uri: `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=0D8ABC&color=fff` }}
+                style={styles.personImageHorizontal}
+              />
+              <Text style={styles.personNameHorizontal}>{name}</Text>
+            </View>
+          ))}
         </View>
       </View>
+
 
       <View style={styles.section}>
         <Text style={styles.header}>Diễn viên</Text>
         <View style={styles.personRowHorizontal}>
-          <View style={styles.personBox}>
-            <Image
-              source={require('../Asset/robert.png')}
-              style={styles.personImageHorizontal}
-            />
-            <Text style={styles.personNameHorizontal}>Robert Downey Jr.</Text>
-          </View>
-
-          <View style={styles.personBox}>
-            <Image
-              source={require('../Asset/chris_hemsworth.png')}
-              style={styles.personImageHorizontal}
-            />
-            <Text style={styles.personNameHorizontal}>Chris Hemsworth</Text>
-          </View>
-
-          <View style={styles.personBox}>
-            <Image
-              source={require('../Asset/chris_evans.png')}
-              style={styles.personImageHorizontal}
-            />
-            <Text style={styles.personNameHorizontal}>Chris Evans</Text>
-          </View>
+          {(Array.isArray(movie.actors) ? movie.actors : [movie.actors]).map((name, index) => (
+            <View style={styles.personBox} key={index}>
+              <Image
+                source={{ uri: `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=6a1b9a&color=fff` }}
+                style={styles.personImageHorizontal}
+              />
+              <Text style={styles.personNameHorizontal}>{name}</Text>
+            </View>
+          ))}
         </View>
       </View>
+
 
       <View style={styles.section}>
         <Text style={styles.header}>Rạp chiếu</Text>
@@ -147,7 +129,7 @@ const MovieDetailScreen = ({ route, navigation }) => {
           posterUrl,
         })}
       >
-        <Text style={styles.continueText}>Tiếp tục</Text>
+        <Text style={styles.continueText}>Đặt vé</Text>
       </TouchableOpacity>
     </ScrollView>
   );

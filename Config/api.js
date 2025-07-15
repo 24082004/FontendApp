@@ -1,4 +1,4 @@
-// config/api.js
+// Config/api.js
 
 // Cấu hình môi trường
 const ENVIRONMENTS = {
@@ -64,12 +64,26 @@ export const API_CONFIG = {
   //   DETAIL: (id) => `${CONFIG.API_BASE_URL}/products/${id}`,
   // }
 };
+export const processImageUrl = (imageUrl, fallback = null) => {
+  if (!imageUrl || imageUrl.trim() === '') {
+    return fallback || `https://picsum.photos/300/450?random=${Math.floor(Math.random() * 1000)}`;
+  }
 
-// Export default headers
-export const DEFAULT_HEADERS = {
-  'Content-Type': 'application/json',
-  'Accept': 'application/json',
+  // Nếu đã là full URL
+  if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
+    return imageUrl;
+  }
+
+  // Nếu là relative path
+  if (imageUrl.startsWith('/')) {
+    return `${CONFIG.API_BASE_URL.replace('/api', '')}${imageUrl}`;
+  }
+
+  // Fallback
+  return fallback || imageUrl;
 };
+
+
 
 // Export API status codes
 export const API_STATUS = {

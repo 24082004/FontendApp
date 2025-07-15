@@ -55,7 +55,7 @@ export default function MyTicket() {
         </Text>
 
         <Image 
-          source={require('../Asset/we.png')}
+          source={require('../Asset/ma-vach-la-gi-2.png')}
           style={styles.barcode}
           resizeMode="contain"
         />
