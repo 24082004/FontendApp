@@ -123,6 +123,7 @@ const MovieDetailScreen = ({ route, navigation }) => {
       <View style={styles.section}>
         <Text style={styles.header}>Đạo diễn</Text>
         <View style={styles.personRowHorizontal}>
+<<<<<<< HEAD
           {loading && directors.length === 0 ? (
             <ActivityIndicator color="#ffc107" />
           ) : directors.length > 0 ? (
@@ -138,12 +139,25 @@ const MovieDetailScreen = ({ route, navigation }) => {
           ) : (
             <Text style={{ color: '#ccc' }}>Đang cập nhật...</Text>
           )}
+=======
+          {(Array.isArray(movie.director) ? movie.director : [movie.director]).map((name, index) => (
+            <View style={styles.personBox} key={index}>
+              <Image
+                source={{ uri: `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=0D8ABC&color=fff` }}
+                style={styles.personImageHorizontal}
+              />
+              <Text style={styles.personNameHorizontal}>{name}</Text>
+            </View>
+          ))}
+>>>>>>> 13db6bf587125d39032782d5d3639d6e2e924792
         </View>
       </View>
+
 
       <View style={styles.section}>
         <Text style={styles.header}>Diễn viên</Text>
         <View style={styles.personRowHorizontal}>
+<<<<<<< HEAD
           {loading && actors.length === 0 ? (
             <ActivityIndicator color="#ffc107" />
           ) : actors.length > 0 ? (
@@ -159,8 +173,20 @@ const MovieDetailScreen = ({ route, navigation }) => {
           ) : (
             <Text style={{ color: '#ccc' }}>Đang cập nhật...</Text>
           )}
+=======
+          {(Array.isArray(movie.actors) ? movie.actors : [movie.actors]).map((name, index) => (
+            <View style={styles.personBox} key={index}>
+              <Image
+                source={{ uri: `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=6a1b9a&color=fff` }}
+                style={styles.personImageHorizontal}
+              />
+              <Text style={styles.personNameHorizontal}>{name}</Text>
+            </View>
+          ))}
+>>>>>>> 13db6bf587125d39032782d5d3639d6e2e924792
         </View>
       </View>
+
 
       <View style={styles.section}>
         <Text style={styles.header}>Rạp chiếu</Text>
@@ -190,7 +216,7 @@ const MovieDetailScreen = ({ route, navigation }) => {
           posterUrl,
         })}
       >
-        <Text style={styles.continueText}>Tiếp tục</Text>
+        <Text style={styles.continueText}>Đặt vé</Text>
       </TouchableOpacity>
     </ScrollView>
   );

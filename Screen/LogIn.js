@@ -25,7 +25,6 @@ const SignIn = ({ navigation }) => {
     setLoading(true);
 
     try {
-      // Tài khoản demo - đăng nhập offline
       if (
         (email === 'test@demo.com' && password === '123456') ||
         (email === 'admin@demo.com' && password === 'admin123') ||
@@ -37,7 +36,6 @@ const SignIn = ({ navigation }) => {
         return;
       }
 
-      // Gọi API đăng nhập thực
       const result = await AuthService.login(email, password);
 
       if (result.success) {
@@ -90,14 +88,6 @@ const SignIn = ({ navigation }) => {
 
       <Text style={styles.title}>Đăng nhập</Text>
 
-      <View style={styles.infoBox}>
-        <Text style={styles.infoText}>
-          💡 Hướng dẫn đăng nhập:
-          {'\n'}• Nếu bạn vừa đăng ký, vui lòng kiểm tra email và hoàn tất xác thực OTP trước
-          {'\n'}• Tài khoản demo: test@demo.com / 123456
-        </Text>
-      </View>
-
       <View style={styles.inputBox}>
         <FontAwesome name="envelope" size={20} color="white" style={styles.icon} />
         <TextInput
@@ -124,16 +114,6 @@ const SignIn = ({ navigation }) => {
           <Feather name={showPassword ? 'eye-off' : 'eye'} size={20} color="#888" />
         </TouchableOpacity>
       </View>
-
-      <TouchableOpacity 
-        style={styles.demoButton}
-        onPress={() => {
-          setEmail('test@demo.com');
-          setPassword('123456');
-        }}
-      >
-        <Text style={styles.demoButtonText}>📝 Điền tài khoản demo</Text>
-      </TouchableOpacity>
 
       <View style={styles.rowOptions}>
         <TouchableOpacity style={styles.checkboxContainer} onPress={() => setRememberMe(!rememberMe)}>

@@ -1,4 +1,4 @@
-// config/api.js
+// Config/api.js
 
 // Cấu hình môi trường
 const ENVIRONMENTS = {
@@ -47,6 +47,7 @@ export const API_CONFIG = {
 
   // Movie endpoints
   MOVIE: {
+<<<<<<< HEAD
     LIST: `${CONFIG.API_BASE_URL}/movies`,                        // Lấy danh sách tất cả phim
     COMING_SOON: `${CONFIG.API_BASE_URL}/movies?status=coming-soon`, // Lấy phim sắp chiếu
     DETAIL: (id) => `${CONFIG.API_BASE_URL}/movies/${id}`,       // Chi tiết phim theo ID
@@ -56,9 +57,26 @@ export const API_CONFIG = {
   UTILS: {
     DIRECTORS: (movieId) => `${CONFIG.API_BASE_URL}/utils/directors?movieId=${movieId}`,
     ACTORS: (movieId) => `${CONFIG.API_BASE_URL}/utils/actors?movieId=${movieId}`,
+=======
+  LIST: `${CONFIG.API_BASE_URL}/movies`,
+    DETAIL: (id) => `${CONFIG.API_BASE_URL}/movies/${id}`,
+    SEARCH: `${CONFIG.API_BASE_URL}/movies/search`,
+    BY_GENRE: (genreId) => `${CONFIG.API_BASE_URL}/movies?genre=${genreId}`,
+    BY_DIRECTOR: (directorId) => `${CONFIG.API_BASE_URL}/movies?director=${directorId}`,
+    BY_ACTOR: (actorId) => `${CONFIG.API_BASE_URL}/movies?actor=${actorId}`,
+    NOW_SHOWING: `${CONFIG.API_BASE_URL}/movies?status=now-showing`,
+    COMING_SOON: `${CONFIG.API_BASE_URL}/movies?status=coming-soon`,
+    POPULAR: `${CONFIG.API_BASE_URL}/movies?sort=-rate&limit=10`,
+    LATEST: `${CONFIG.API_BASE_URL}/movies?sort=-release_date&limit=10`,
+>>>>>>> 13db6bf587125d39032782d5d3639d6e2e924792
   },
 };
+export const processImageUrl = (imageUrl, fallback = null) => {
+  if (!imageUrl || imageUrl.trim() === '') {
+    return fallback || `https://picsum.photos/300/450?random=${Math.floor(Math.random() * 1000)}`;
+  }
 
+<<<<<<< HEAD
 // Headers mặc định
 export const DEFAULT_HEADERS = {
   'Content-Type': 'application/json',
@@ -66,6 +84,25 @@ export const DEFAULT_HEADERS = {
 };
 
 // Trạng thái HTTP
+=======
+  // Nếu đã là full URL
+  if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
+    return imageUrl;
+  }
+
+  // Nếu là relative path
+  if (imageUrl.startsWith('/')) {
+    return `${CONFIG.API_BASE_URL.replace('/api', '')}${imageUrl}`;
+  }
+
+  // Fallback
+  return fallback || imageUrl;
+};
+
+
+
+// Export API status codes
+>>>>>>> 13db6bf587125d39032782d5d3639d6e2e924792
 export const API_STATUS = {
   SUCCESS: 200,
   CREATED: 201,

@@ -62,8 +62,31 @@ const PaymentScreen = ({ route, navigation }) => {
         <Text style={styles.total}>Total <Text style={{ color: '#FFD700' }}>{totalPrice.toLocaleString()} VND</Text></Text>
 
         <Text style={styles.label}>Payment Method</Text>
+<<<<<<< HEAD
 
         {[{ name: 'Thanh toán tại quầy', icon: require('../assets/cash.png') },
+=======
+        <TouchableOpacity
+          style={[styles.paymentMethod, styles.selectedMethod]}
+          onPress={() => {
+            navigation.navigate('MyTicket', {
+              movieTitle,
+              selectedSeats,
+              selectedDate,
+              selectedTime,
+              cinema,
+              orderId,
+              totalPrice,
+              paymentMethod: 'Thanh toán tại quầy',
+            });
+          }}
+        >
+          <Text style={[styles.paymentText, { fontWeight: 'bold', color: '#FFD700' }]}>💵 Thanh toán tại quầy</Text>
+        </TouchableOpacity>
+
+        {/* Other Methods */}
+        {[
+>>>>>>> 13db6bf587125d39032782d5d3639d6e2e924792
           { name: 'Zalo Pay', icon: require('../assets/zalopay.png') },
           { name: 'MoMo', icon: require('../assets/momo.png') },
           { name: 'Shopee Pay', icon: require('../assets/shopeepay.png') },

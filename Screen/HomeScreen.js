@@ -18,13 +18,19 @@ export default function HomeScreen({ navigation }) {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const now = await MovieService.getNowShowing();
-        const soon = await MovieService.getComingSoon();
+        const allMovies = await MovieService.getNowShowing(); // dùng getNowShowing là getAll
+        const currentDate = new Date();
+
+        // Tự lọc bằng release_date
+        const now = allMovies.filter(m => new Date(m.release_date) <= currentDate);
+        const soon = allMovies.filter(m => new Date(m.release_date) > currentDate);
+
         setNowShowing(now);
         setComingSoon(soon);
-        setLoading(false);
       } catch (error) {
         console.error('Lỗi khi tải phim', error);
+      } finally {
+        setLoading(false);
       }
     };
     fetchData();
@@ -60,6 +66,8 @@ export default function HomeScreen({ navigation }) {
                     votes: movie.votes || 0,
                     posterUrl: movie.image,
                     description: movie.description || 'Đang cập nhật',
+                    director: movie.directorNames || movie.director || [],
+                    actors: movie.actorNames || movie.actors || []
                   },
                 })
               }
@@ -86,20 +94,40 @@ export default function HomeScreen({ navigation }) {
         <Text style={styles.sectionTitle}>Sắp chiếu</Text>
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
           {comingSoon.map((movie, index) => (
-            <View key={movie._id || index} style={styles.comingItem}>
+            <TouchableOpacity
+              key={movie._id || index}
+              style={styles.comingItem}
+              onPress={() =>
+                navigation.navigate('MovieDetail', {
+                  movie: {
+                    title: movie.name,
+                    duration: movie.durationFormatted || movie.duration,
+                    releaseDate: new Date(movie.release_date).toLocaleDateString('vi-VN'),
+                    genre: movie.genreNames?.join(', ') || 'Đang cập nhật',
+                    rating: movie.rate,
+                    votes: movie.votes || 0,
+                    posterUrl: movie.image,
+                    description: movie.description || 'Đang cập nhật',
+                  },
+                })
+              }
+            >
               <Image
                 source={{ uri: movie.image }}
                 style={styles.comingPoster}
                 resizeMode="cover"
               />
-              <Text style={styles.movieTitle}>{movie.name}</Text>
-            </View>
+              <Text style={styles.movieTitle} numberOfLines={2}>
+                {movie.name}
+              </Text>
+            </TouchableOpacity>
           ))}
         </ScrollView>
       </View>
     </ScrollView>
   );
 }
+
 
 const styles = StyleSheet.create({
   container: {
@@ -152,21 +180,30 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     marginTop: 4,
   },
-  movieDetail: {
-    color: '#ccc',
-    fontSize: 12,
-  },
-  movieRating: {
-    color: '#ffc107',
-    fontSize: 12,
-  },
   comingItem: {
-    marginRight: 10,
+  marginRight: 10,
+  width: 140,
+  alignItems: 'center',
   },
+
   comingPoster: {
     width: 120,
     height: 180,
     borderRadius: 8,
+    marginBottom: 6,
+  },
+
+  movieTitle: {
+    color: '#fff',
+    fontSize: 13,
+    fontWeight: '500',
+    textAlign: 'center',
+    width: 120,
+  },
+
+  movieRating: {
+    color: '#ffc107',
+    fontSize: 12,
   },
   promo: {
     width: '100%',
