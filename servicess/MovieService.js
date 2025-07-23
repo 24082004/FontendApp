@@ -9,8 +9,8 @@ class MovieService {
     });
 
     const text = await response.text();
-    console.log('▶️ Fetching URL:', url);
-    console.log('▶️ Response text:', text);
+    // console.log('▶️ Fetching URL:', url);
+    // console.log('▶️ Response text:', text);
 
     const data = JSON.parse(text);
     return data.success ? data.data : [];
