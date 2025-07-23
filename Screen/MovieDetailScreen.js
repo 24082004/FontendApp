@@ -138,6 +138,15 @@ const MovieDetailScreen = ({ route, navigation }) => {
           ) : (
             <Text style={{ color: '#ccc' }}>Đang cập nhật...</Text>
           )}
+          {(Array.isArray(movie.director) ? movie.director : [movie.director]).map((name, index) => (
+            <View style={styles.personBox} key={index}>
+              <Image
+                source={{ uri: `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=0D8ABC&color=fff` }}
+                style={styles.personImageHorizontal}
+              />
+              <Text style={styles.personNameHorizontal}>{name}</Text>
+            </View>
+          ))}
         </View>
       </View>
 
@@ -161,6 +170,15 @@ const MovieDetailScreen = ({ route, navigation }) => {
           ) : (
             <Text style={{ color: '#ccc' }}>Đang cập nhật...</Text>
           )}
+          {(Array.isArray(movie.actors) ? movie.actors : [movie.actors]).map((name, index) => (
+            <View style={styles.personBox} key={index}>
+              <Image
+                source={{ uri: `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=6a1b9a&color=fff` }}
+                style={styles.personImageHorizontal}
+              />
+              <Text style={styles.personNameHorizontal}>{name}</Text>
+            </View>
+          ))}
         </View>
       </View>
 

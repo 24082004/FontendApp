@@ -4,7 +4,7 @@
 const ENVIRONMENTS = {
   development: {
     API_BASE_URL: 'https://my-backend-api-movie.onrender.com/api',
-    // API_BASE_URL: 'http://10.0.2.2:3000/api',   // Android Emulator
+    // API_BASE_URL: 'http://10.0.2.2:3000/api', // Android Emulator
     // API_BASE_URL: 'http://localhost:3000/api', // iOS Simulator
   },
   staging: {
@@ -21,7 +21,7 @@ const CURRENT_ENV = __DEV__ ? 'development' : 'production';
 // Lấy config từ môi trường hiện tại
 const CONFIG = ENVIRONMENTS[CURRENT_ENV];
 
-// Export API endpoints
+// API cấu hình
 export const API_CONFIG = {
   BASE_URL: CONFIG.API_BASE_URL,
   TIMEOUT: 10000, // 10 seconds
@@ -47,7 +47,7 @@ export const API_CONFIG = {
 
   // Movie endpoints
   MOVIE: {
-  LIST: `${CONFIG.API_BASE_URL}/movies`,
+    LIST: `${CONFIG.API_BASE_URL}/movies`,
     DETAIL: (id) => `${CONFIG.API_BASE_URL}/movies/${id}`,
     SEARCH: `${CONFIG.API_BASE_URL}/movies/search`,
     BY_GENRE: (genreId) => `${CONFIG.API_BASE_URL}/movies?genre=${genreId}`,
@@ -57,46 +57,39 @@ export const API_CONFIG = {
     COMING_SOON: `${CONFIG.API_BASE_URL}/movies?status=coming-soon`,
     POPULAR: `${CONFIG.API_BASE_URL}/movies?sort=-rate&limit=10`,
     LATEST: `${CONFIG.API_BASE_URL}/movies?sort=-release_date&limit=10`,
-    LIST: `${CONFIG.API_BASE_URL}/movies`,                        // Lấy danh sách tất cả phim
-    COMING_SOON: `${CONFIG.API_BASE_URL}/movies?status=coming-soon`, // Lấy phim sắp chiếu
-    DETAIL: (id) => `${CONFIG.API_BASE_URL}/movies/${id}`,       // Chi tiết phim theo ID
   },
 
-  // Utils endpoints (đạo diễn, diễn viên...)
+  // Utils endpoints
   UTILS: {
     DIRECTORS: (movieId) => `${CONFIG.API_BASE_URL}/utils/directors?movieId=${movieId}`,
     ACTORS: (movieId) => `${CONFIG.API_BASE_URL}/utils/actors?movieId=${movieId}`,
   },
 };
+
+// Hàm xử lý ảnh (URL)
 export const processImageUrl = (imageUrl, fallback = null) => {
   if (!imageUrl || imageUrl.trim() === '') {
     return fallback || `https://picsum.photos/300/450?random=${Math.floor(Math.random() * 1000)}`;
   }
 
-  // Nếu đã là full URL
   if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
     return imageUrl;
   }
 
-  // Nếu là relative path
   if (imageUrl.startsWith('/')) {
     return `${CONFIG.API_BASE_URL.replace('/api', '')}${imageUrl}`;
   }
 
-  // Fallback
   return fallback || imageUrl;
 };
 
-
-
-// Export API status codes
 // Headers mặc định
 export const DEFAULT_HEADERS = {
   'Content-Type': 'application/json',
   Accept: 'application/json',
 };
 
-// Trạng thái HTTP
+// Trạng thái API
 export const API_STATUS = {
   SUCCESS: 200,
   CREATED: 201,
@@ -107,4 +100,5 @@ export const API_STATUS = {
   SERVER_ERROR: 500,
 };
 
+// Export mặc định
 export default API_CONFIG;

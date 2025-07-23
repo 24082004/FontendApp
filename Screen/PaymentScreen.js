@@ -1,5 +1,14 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, Image, TextInput, TouchableOpacity, ScrollView, ToastAndroid } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  TextInput,
+  TouchableOpacity,
+  ScrollView,
+  ToastAndroid,
+} from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 
 const PaymentScreen = ({ route, navigation }) => {
@@ -17,7 +26,7 @@ const PaymentScreen = ({ route, navigation }) => {
     seatPrice = 105000,
     totalPrice = 210000,
     cinema = 'Vincom Ocean Park CGV',
-    cinemaAddress = ''
+    cinemaAddress = '',
   } = route?.params || {};
 
   const orderId = Math.floor(Math.random() * 10000000000).toString();
@@ -44,14 +53,20 @@ const PaymentScreen = ({ route, navigation }) => {
       <ScrollView contentContainerStyle={styles.content}>
         <View style={styles.movieInfo}>
           <Image
-            source={image || { uri: 'https://upload.wikimedia.org/wikipedia/en/4/4d/Avengers_Infinity_War_poster.jpg' }}
+            source={
+              image || {
+                uri: 'https://upload.wikimedia.org/wikipedia/en/4/4d/Avengers_Infinity_War_poster.jpg',
+              }
+            }
             style={styles.poster}
           />
           <View style={styles.movieDetails}>
             <Text style={styles.movieTitle}>{movieTitle}</Text>
             <Text style={styles.movieGenre}>• {genre}</Text>
             <Text style={styles.movieLocation}>• {cinema}</Text>
-            <Text style={styles.movieTime}>• {selectedDate} - {selectedTime}</Text>
+            <Text style={styles.movieTime}>
+              • {selectedDate} - {selectedTime}
+            </Text>
           </View>
         </View>
 
@@ -62,7 +77,11 @@ const PaymentScreen = ({ route, navigation }) => {
         <Text style={styles.value}>{selectedSeats.join(', ')}</Text>
 
         <View style={styles.discountRow}>
-          <TextInput style={styles.discountInput} placeholder="discount code" placeholderTextColor="#999" />
+          <TextInput
+            style={styles.discountInput}
+            placeholder="discount code"
+            placeholderTextColor="#999"
+          />
           <TouchableOpacity style={styles.applyButton}>
             <Text style={styles.applyText}>Apply</Text>
           </TouchableOpacity>
@@ -77,14 +96,20 @@ const PaymentScreen = ({ route, navigation }) => {
         {paymentMethods.map((item, index) => (
           <TouchableOpacity
             key={index}
-            style={[styles.paymentMethod, selectedPaymentMethod === item.name && styles.selectedMethod]}
+            style={[
+              styles.paymentMethod,
+              selectedPaymentMethod === item.name && styles.selectedMethod,
+            ]}
             onPress={() => setSelectedPaymentMethod(item.name)}
           >
             <Image source={item.icon} style={styles.paymentIcon} />
             <Text
               style={[
                 styles.paymentText,
-                selectedPaymentMethod === item.name && { color: '#FFD700', fontWeight: 'bold' },
+                selectedPaymentMethod === item.name && {
+                  color: '#FFD700',
+                  fontWeight: 'bold',
+                },
               ]}
             >
               {item.name}
@@ -112,7 +137,7 @@ const PaymentScreen = ({ route, navigation }) => {
               cinema,
               orderId,
               totalPrice,
-              paymentMethod: selectedPaymentMethod
+              paymentMethod: selectedPaymentMethod,
             });
           } else {
             ToastAndroid.show('Phương thức này chưa hỗ trợ.', ToastAndroid.SHORT);
