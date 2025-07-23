@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -7,10 +7,62 @@ import {
   ScrollView,
   TouchableOpacity,
   ImageBackground,
+  ActivityIndicator,
 } from 'react-native';
+import { API_CONFIG } from '../\Config/api'; 
+
+const BASE_URL = API_CONFIG.BASE_URL;
 
 const MovieDetailScreen = ({ route, navigation }) => {
   const { movie } = route.params;
+
+  const [directors, setDirectors] = useState([]);
+  const [actors, setActors] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (movie && movie._id) {
+      console.log('movie:', movie);
+      fetchDirectors(movie._id);
+      fetchActors(movie._id);
+    }
+  }, [movie]);
+
+  const fetchDirectors = async (movieId) => {
+    try {
+      const url = `${BASE_URL}/directors?movieId=${movieId}`;
+      console.log('URL:', url);
+      const response = await fetch(url);
+      const data = await response.json();
+      console.log('Kết quả đạo diễn:', data);
+
+      if (data.success) setDirectors(data.data || []);
+    } catch (error) {
+      console.error('Lỗi khi tải đạo diễn:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchActors = async (movieId) => {
+    try {
+      const url = `${BASE_URL}/actors?movieId=${movieId}`;
+      console.log(' Gọi API diễn viên:', url);
+      const response = await fetch(url);
+      const data = await response.json();
+      console.log(' Kết quả diễn viên:', data);
+
+      if (data.success) setActors(data.data || []);
+    } catch (error) {
+      console.error(' Lỗi khi tải diễn viên:', error);
+    }
+  };
+
+  const getPersonImage = (imageUrl, index = 1) => {
+    if (imageUrl?.startsWith('http')) return imageUrl;
+    if (imageUrl?.startsWith('/')) return `${BASE_URL.replace('/api', '')}${imageUrl}`;
+    return `https://picsum.photos/60/60?random=${index}`;
+  };
 
   if (!movie) {
     return (
@@ -71,33 +123,47 @@ const MovieDetailScreen = ({ route, navigation }) => {
       <View style={styles.section}>
         <Text style={styles.header}>Đạo diễn</Text>
         <View style={styles.personRowHorizontal}>
-          {(Array.isArray(movie.director) ? movie.director : [movie.director]).map((name, index) => (
-            <View style={styles.personBox} key={index}>
-              <Image
-                source={{ uri: `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=0D8ABC&color=fff` }}
-                style={styles.personImageHorizontal}
-              />
-              <Text style={styles.personNameHorizontal}>{name}</Text>
-            </View>
-          ))}
+          {loading && directors.length === 0 ? (
+            <ActivityIndicator color="#ffc107" />
+          ) : directors.length > 0 ? (
+            directors.map((d, index) => (
+              <View key={index} style={styles.personBox}>
+                <Image
+                  source={{ uri: getPersonImage(d.image, index) }}
+                  style={styles.personImageHorizontal}
+                />
+                <Text style={styles.personNameHorizontal}>{d.name}</Text>
+              </View>
+            ))
+          ) : (
+            <Text style={{ color: '#ccc' }}>Đang cập nhật...</Text>
+          )}
         </View>
       </View>
+
 
 
       <View style={styles.section}>
         <Text style={styles.header}>Diễn viên</Text>
         <View style={styles.personRowHorizontal}>
-          {(Array.isArray(movie.actors) ? movie.actors : [movie.actors]).map((name, index) => (
-            <View style={styles.personBox} key={index}>
-              <Image
-                source={{ uri: `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=6a1b9a&color=fff` }}
-                style={styles.personImageHorizontal}
-              />
-              <Text style={styles.personNameHorizontal}>{name}</Text>
-            </View>
-          ))}
+          {loading && actors.length === 0 ? (
+            <ActivityIndicator color="#ffc107" />
+          ) : actors.length > 0 ? (
+            actors.map((a, index) => (
+              <View key={index} style={styles.personBox}>
+                <Image
+                  source={{ uri: getPersonImage(a.image, index + 10) }}
+                  style={styles.personImageHorizontal}
+                />
+                <Text style={styles.personNameHorizontal}>{a.name}</Text>
+              </View>
+            ))
+          ) : (
+            <Text style={{ color: '#ccc' }}>Đang cập nhật...</Text>
+          )}
         </View>
       </View>
+
 
 
       <View style={styles.section}>
@@ -109,7 +175,6 @@ const MovieDetailScreen = ({ route, navigation }) => {
               4.55 km | Đa Tốn, Gia Lâm, Hà Nội
             </Text>
           </View>
-
           <Image
             source={require('../Asset/cgv_logo.png')}
             style={styles.logo}
@@ -136,6 +201,7 @@ const MovieDetailScreen = ({ route, navigation }) => {
 };
 
 const styles = StyleSheet.create({
+  // giữ nguyên toàn bộ phần styles như bạn đã có
   container: {
     flex: 1,
     backgroundColor: '#000',
@@ -245,6 +311,7 @@ const styles = StyleSheet.create({
     padding: 14,
     borderRadius: 30,
     margin: 16,
+    marginBottom: 40,
     alignItems: 'center',
   },
   continueText: {

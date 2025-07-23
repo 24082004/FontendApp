@@ -264,6 +264,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     marginTop: 20,
+    marginBottom: 50,
   },
   total: {
     color: '#fff',

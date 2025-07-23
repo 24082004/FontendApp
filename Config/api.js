@@ -3,16 +3,16 @@
 // Cấu hình môi trường
 const ENVIRONMENTS = {
   development: {
-    API_BASE_URL: 'https://my-backend-api-movie.onrender.com/api', // IP máy local
+    API_BASE_URL: 'https://my-backend-api-movie.onrender.com/api',
     // API_BASE_URL: 'http://10.0.2.2:3000/api',   // Android Emulator
-    // API_BASE_URL: 'http://localhost:3000/api',   // iOS Simulator
+    // API_BASE_URL: 'http://localhost:3000/api', // iOS Simulator
   },
   staging: {
     API_BASE_URL: 'https://your-staging-api.com/api',
   },
   production: {
     API_BASE_URL: 'https://your-production-api.com/api',
-  }
+  },
 };
 
 // Chọn môi trường hiện tại
@@ -25,7 +25,7 @@ const CONFIG = ENVIRONMENTS[CURRENT_ENV];
 export const API_CONFIG = {
   BASE_URL: CONFIG.API_BASE_URL,
   TIMEOUT: 10000, // 10 seconds
-  
+
   // Auth endpoints
   AUTH: {
     REGISTER: `${CONFIG.API_BASE_URL}/auth/register`,
@@ -36,7 +36,7 @@ export const API_CONFIG = {
     VERIFY_EMAIL: `${CONFIG.API_BASE_URL}/auth/verify-email`,
     RESEND_OTP: `${CONFIG.API_BASE_URL}/auth/resend-otp`,
   },
-  
+
   // User endpoints
   USER: {
     PROFILE: `${CONFIG.API_BASE_URL}/user/profile`,
@@ -45,6 +45,7 @@ export const API_CONFIG = {
     CHANGE_PASSWORD: `${CONFIG.API_BASE_URL}/user/change-password`,
   },
 
+  // Movie endpoints
   MOVIE: {
   LIST: `${CONFIG.API_BASE_URL}/movies`,
     DETAIL: (id) => `${CONFIG.API_BASE_URL}/movies/${id}`,
@@ -56,13 +57,16 @@ export const API_CONFIG = {
     COMING_SOON: `${CONFIG.API_BASE_URL}/movies?status=coming-soon`,
     POPULAR: `${CONFIG.API_BASE_URL}/movies?sort=-rate&limit=10`,
     LATEST: `${CONFIG.API_BASE_URL}/movies?sort=-release_date&limit=10`,
+    LIST: `${CONFIG.API_BASE_URL}/movies`,                        // Lấy danh sách tất cả phim
+    COMING_SOON: `${CONFIG.API_BASE_URL}/movies?status=coming-soon`, // Lấy phim sắp chiếu
+    DETAIL: (id) => `${CONFIG.API_BASE_URL}/movies/${id}`,       // Chi tiết phim theo ID
   },
-  
-  // Thêm các endpoints khác nếu cần
-  // PRODUCT: {
-  //   LIST: `${CONFIG.API_BASE_URL}/products`,
-  //   DETAIL: (id) => `${CONFIG.API_BASE_URL}/products/${id}`,
-  // }
+
+  // Utils endpoints (đạo diễn, diễn viên...)
+  UTILS: {
+    DIRECTORS: (movieId) => `${CONFIG.API_BASE_URL}/utils/directors?movieId=${movieId}`,
+    ACTORS: (movieId) => `${CONFIG.API_BASE_URL}/utils/actors?movieId=${movieId}`,
+  },
 };
 export const processImageUrl = (imageUrl, fallback = null) => {
   if (!imageUrl || imageUrl.trim() === '') {
@@ -86,6 +90,13 @@ export const processImageUrl = (imageUrl, fallback = null) => {
 
 
 // Export API status codes
+// Headers mặc định
+export const DEFAULT_HEADERS = {
+  'Content-Type': 'application/json',
+  Accept: 'application/json',
+};
+
+// Trạng thái HTTP
 export const API_STATUS = {
   SUCCESS: 200,
   CREATED: 201,
