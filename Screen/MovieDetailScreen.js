@@ -9,7 +9,7 @@ import {
   ImageBackground,
   ActivityIndicator,
 } from 'react-native';
-import { API_CONFIG } from '../\Config/api'; //  Import cấu hình API
+import { API_CONFIG } from '../\Config/api'; 
 
 const BASE_URL = API_CONFIG.BASE_URL;
 
@@ -123,7 +123,6 @@ const MovieDetailScreen = ({ route, navigation }) => {
       <View style={styles.section}>
         <Text style={styles.header}>Đạo diễn</Text>
         <View style={styles.personRowHorizontal}>
-<<<<<<< HEAD
           {loading && directors.length === 0 ? (
             <ActivityIndicator color="#ffc107" />
           ) : directors.length > 0 ? (
@@ -139,7 +138,6 @@ const MovieDetailScreen = ({ route, navigation }) => {
           ) : (
             <Text style={{ color: '#ccc' }}>Đang cập nhật...</Text>
           )}
-=======
           {(Array.isArray(movie.director) ? movie.director : [movie.director]).map((name, index) => (
             <View style={styles.personBox} key={index}>
               <Image
@@ -149,15 +147,14 @@ const MovieDetailScreen = ({ route, navigation }) => {
               <Text style={styles.personNameHorizontal}>{name}</Text>
             </View>
           ))}
->>>>>>> 13db6bf587125d39032782d5d3639d6e2e924792
         </View>
       </View>
+
 
 
       <View style={styles.section}>
         <Text style={styles.header}>Diễn viên</Text>
         <View style={styles.personRowHorizontal}>
-<<<<<<< HEAD
           {loading && actors.length === 0 ? (
             <ActivityIndicator color="#ffc107" />
           ) : actors.length > 0 ? (
@@ -173,7 +170,6 @@ const MovieDetailScreen = ({ route, navigation }) => {
           ) : (
             <Text style={{ color: '#ccc' }}>Đang cập nhật...</Text>
           )}
-=======
           {(Array.isArray(movie.actors) ? movie.actors : [movie.actors]).map((name, index) => (
             <View style={styles.personBox} key={index}>
               <Image
@@ -183,9 +179,9 @@ const MovieDetailScreen = ({ route, navigation }) => {
               <Text style={styles.personNameHorizontal}>{name}</Text>
             </View>
           ))}
->>>>>>> 13db6bf587125d39032782d5d3639d6e2e924792
         </View>
       </View>
+
 
 
       <View style={styles.section}>
@@ -333,6 +329,7 @@ const styles = StyleSheet.create({
     padding: 14,
     borderRadius: 30,
     margin: 16,
+    marginBottom: 40,
     alignItems: 'center',
   },
   continueText: {

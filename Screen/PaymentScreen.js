@@ -1,6 +1,18 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, Image, TextInput, TouchableOpacity, ScrollView, ToastAndroid } from 'react-native';
+import {
+  View, Text, StyleSheet, Image, TextInput,
+  TouchableOpacity, ScrollView, ToastAndroid
+} from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
+
+const paymentOptions = [
+  { name: 'Thanh toán tại quầy', icon: require('../assets/cash.png') },
+  { name: 'Zalo Pay', icon: require('../assets/zalopay.png') },
+  { name: 'MoMo', icon: require('../assets/momo.png') },
+  { name: 'Shopee Pay', icon: require('../assets/shopeepay.png') },
+  { name: 'ATM Card', icon: require('../assets/atm.png') },
+  { name: 'International payments', icon: require('../assets/visa.png') },
+];
 
 const PaymentScreen = ({ route, navigation }) => {
   const {
@@ -35,7 +47,7 @@ const PaymentScreen = ({ route, navigation }) => {
       <ScrollView contentContainerStyle={styles.content}>
         <View style={styles.movieInfo}>
           <Image
-            source={image || { uri: 'https://upload.wikimedia.org/wikipedia/en/4/4d/Avengers_Infinity_War_poster.jpg' }}
+            source={image ? { uri: image } : require('../assets/puss.png')}
             style={styles.poster}
           />
           <View style={styles.movieDetails}>
@@ -59,46 +71,27 @@ const PaymentScreen = ({ route, navigation }) => {
           </TouchableOpacity>
         </View>
 
-        <Text style={styles.total}>Total <Text style={{ color: '#FFD700' }}>{totalPrice.toLocaleString()} VND</Text></Text>
+        <Text style={styles.total}>
+          Total <Text style={{ color: '#FFD700' }}>{totalPrice.toLocaleString()} VND</Text>
+        </Text>
 
         <Text style={styles.label}>Payment Method</Text>
-<<<<<<< HEAD
-
-        {[{ name: 'Thanh toán tại quầy', icon: require('../assets/cash.png') },
-=======
-        <TouchableOpacity
-          style={[styles.paymentMethod, styles.selectedMethod]}
-          onPress={() => {
-            navigation.navigate('MyTicket', {
-              movieTitle,
-              selectedSeats,
-              selectedDate,
-              selectedTime,
-              cinema,
-              orderId,
-              totalPrice,
-              paymentMethod: 'Thanh toán tại quầy',
-            });
-          }}
-        >
-          <Text style={[styles.paymentText, { fontWeight: 'bold', color: '#FFD700' }]}>💵 Thanh toán tại quầy</Text>
-        </TouchableOpacity>
-
-        {/* Other Methods */}
-        {[
->>>>>>> 13db6bf587125d39032782d5d3639d6e2e924792
-          { name: 'Zalo Pay', icon: require('../assets/zalopay.png') },
-          { name: 'MoMo', icon: require('../assets/momo.png') },
-          { name: 'Shopee Pay', icon: require('../assets/shopeepay.png') },
-          { name: 'ATM Card', icon: require('../assets/atm.png') },
-          { name: 'International payments', icon: require('../assets/visa.png') }].map((item, index) => (
+        {paymentOptions.map((item, index) => (
           <TouchableOpacity
             key={index}
-            style={[styles.paymentMethod, selectedPaymentMethod === item.name && styles.selectedMethod]}
+            style={[
+              styles.paymentMethod,
+              selectedPaymentMethod === item.name && styles.selectedMethod
+            ]}
             onPress={() => setSelectedPaymentMethod(item.name)}
           >
             <Image source={item.icon} style={styles.paymentIcon} />
-            <Text style={[styles.paymentText, selectedPaymentMethod === item.name && { color: '#FFD700', fontWeight: 'bold' }]}>{item.name}</Text>
+            <Text style={[
+              styles.paymentText,
+              selectedPaymentMethod === item.name && { color: '#FFD700', fontWeight: 'bold' }
+            ]}>
+              {item.name}
+            </Text>
             <Icon name="chevron-forward" size={20} color="#fff" />
           </TouchableOpacity>
         ))}
