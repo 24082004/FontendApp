@@ -5,7 +5,7 @@ import {getProfile} from '../Services/userService';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
-const ProfileScreen = () => {
+const ProfileScreen = ({navigation}) => {
   // const [isFaceIDEnabled, setIsFaceIDEnabled] = useState(true);
 
   // const toggleSwitch = () => setIsFaceIDEnabled(previousState => !previousState);
@@ -24,7 +24,7 @@ const ProfileScreen = () => {
       }
         const data = await getProfile(token);
         setProfile(data);
-        
+        //console.log("check profile>>",profile);
       } catch (error) {
         console.error(error);
       } finally {
@@ -56,14 +56,14 @@ const ProfileScreen = () => {
       <View style={styles.menu}>
         <OptionItem icon="gift" label="Vé của tôi" />
         <OptionItem icon="shopping-cart" label="Lịch sử thanh toán" />
-        <OptionItem icon="lock" label="Đổi mật khẩu" />
+        <OptionItem icon="lock" label="Đổi mật khẩu" onPress={() => navigation.navigate('ChangePassword')} />
       </View>
     </SafeAreaView>
   );
 };
 
-const OptionItem = ({ icon, label }) => (
-  <TouchableOpacity style={styles.optionRow}>
+const OptionItem = ({ icon, label, onPress }) => (
+  <TouchableOpacity style={styles.optionRow} onPress={onPress}>
     <View style={styles.optionLeft}>
       <Icon name={icon} size={20} color="#fff" style={styles.icon} />
       <Text style={styles.label}>{label}</Text>

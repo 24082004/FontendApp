@@ -15,6 +15,7 @@ import MovieDetailScreen from './Screen/MovieDetailScreen';
 import SelectSeatScreen from './Screen/selectSeatScreen';
 import PaymentScreen from './Screen/PaymentScreen';
 import MyTicket from './Screen/MyTicket';
+import ChangePasswordScreen from './Screen/ChangePasswordScreen';
 
 
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
@@ -79,6 +80,7 @@ export default function App() {
         <Stack.Screen name="PaymentScreen" component={PaymentScreen} />
         <Stack.Screen name="MyTicket" component={MyTicket} />
         <Stack.Screen name="TicketScreen" component={TicketScreen} />
+        <Stack.Screen name="ChangePassword" component={ChangePasswordScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );
