@@ -7,42 +7,37 @@ import {
   TextInput,
   TouchableOpacity,
   ScrollView,
-  ToastAndroid,
+  ToastAndroid
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
+
+const paymentOptions = [
+  { name: 'Thanh toán tại quầy', icon: require('../assets/cash.png') },
+  { name: 'Zalo Pay', icon: require('../assets/zalopay.png') },
+  { name: 'MoMo', icon: require('../assets/momo.png') },
+  { name: 'Shopee Pay', icon: require('../assets/shopeepay.png') },
+  { name: 'ATM Card', icon: require('../assets/atm.png') },
+  { name: 'International payments', icon: require('../assets/visa.png') },
+];
 
 const PaymentScreen = ({ route, navigation }) => {
   const {
     movieTitle = 'Avengers: Infinity War',
-    duration = '',
-    releaseDate = '',
     genre = 'Action, adventure, sci-fi',
-    rating = '',
-    votes = '',
     image = null,
     selectedSeats = ['H7', 'H8'],
     selectedDate = '10.12.2022',
     selectedTime = '14:15',
-    seatPrice = 105000,
     totalPrice = 210000,
     cinema = 'Vincom Ocean Park CGV',
-    cinemaAddress = '',
   } = route?.params || {};
 
   const orderId = Math.floor(Math.random() * 10000000000).toString();
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState('Thanh toán tại quầy');
 
-  const paymentMethods = [
-    { name: 'Thanh toán tại quầy', icon: require('../assets/cash.png') },
-    { name: 'Zalo Pay', icon: require('../assets/zalopay.png') },
-    { name: 'MoMo', icon: require('../assets/momo.png') },
-    { name: 'Shopee Pay', icon: require('../assets/shopeepay.png') },
-    { name: 'ATM Card', icon: require('../assets/atm.png') },
-    { name: 'International payments', icon: require('../assets/visa.png') },
-  ];
-
   return (
     <View style={styles.container}>
+      {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <Icon name="arrow-back" size={24} color="#fff" />
@@ -51,13 +46,10 @@ const PaymentScreen = ({ route, navigation }) => {
       </View>
 
       <ScrollView contentContainerStyle={styles.content}>
+        {/* Movie Info */}
         <View style={styles.movieInfo}>
           <Image
-            source={
-              image || {
-                uri: 'https://upload.wikimedia.org/wikipedia/en/4/4d/Avengers_Infinity_War_poster.jpg',
-              }
-            }
+            source={image ? { uri: image } : require('../assets/puss.png')}
             style={styles.poster}
           />
           <View style={styles.movieDetails}>
@@ -76,6 +68,7 @@ const PaymentScreen = ({ route, navigation }) => {
         <Text style={styles.label}>Seat</Text>
         <Text style={styles.value}>{selectedSeats.join(', ')}</Text>
 
+        {/* Discount */}
         <View style={styles.discountRow}>
           <TextInput
             style={styles.discountInput}
@@ -91,14 +84,14 @@ const PaymentScreen = ({ route, navigation }) => {
           Total <Text style={{ color: '#FFD700' }}>{totalPrice.toLocaleString()} VND</Text>
         </Text>
 
+        {/* Payment Methods */}
         <Text style={styles.label}>Payment Method</Text>
-
-        {paymentMethods.map((item, index) => (
+        {paymentOptions.map((item, index) => (
           <TouchableOpacity
             key={index}
             style={[
               styles.paymentMethod,
-              selectedPaymentMethod === item.name && styles.selectedMethod,
+              selectedPaymentMethod === item.name && styles.selectedMethod
             ]}
             onPress={() => setSelectedPaymentMethod(item.name)}
           >
@@ -118,12 +111,14 @@ const PaymentScreen = ({ route, navigation }) => {
           </TouchableOpacity>
         ))}
 
+        {/* Timer */}
         <View style={styles.timerContainer}>
           <Text style={styles.timerText}>Complete your payment in</Text>
           <Text style={styles.timerValue}>15:00</Text>
         </View>
       </ScrollView>
 
+      {/* Continue Button */}
       <TouchableOpacity
         style={styles.continueButton}
         onPress={() => {
@@ -151,147 +146,172 @@ const PaymentScreen = ({ route, navigation }) => {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#000',
+  container: { 
+    flex: 1, 
+    backgroundColor: '#000' 
   },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 16,
-    paddingTop: 50,
-    backgroundColor: '#000',
+
+  header: { 
+    flexDirection: 'row', 
+    alignItems: 'center', 
+    padding: 16, 
+    paddingTop: 50 
   },
-  headerTitle: {
-    color: '#fff',
-    fontSize: 20,
-    marginLeft: 10,
-    fontWeight: 'bold',
+
+  headerTitle: { 
+    color: '#fff', 
+    fontSize: 20, 
+    marginLeft: 10, 
+    fontWeight: 'bold' 
   },
-  content: {
-    padding: 16,
+
+  content: { 
+    padding: 16 
   },
-  movieInfo: {
-    flexDirection: 'row',
-    backgroundColor: '#1a1a1a',
-    borderRadius: 12,
-    padding: 10,
-    marginBottom: 20,
+
+  movieInfo: { 
+    flexDirection: 'row', 
+    backgroundColor: '#1a1a1a', 
+    borderRadius: 12, 
+    padding: 10, 
+    marginBottom: 20 
   },
-  poster: {
-    width: 70,
-    height: 100,
-    borderRadius: 8,
+
+  poster: { 
+    width: 70, 
+    height: 100, 
+    borderRadius: 8 
   },
-  movieDetails: {
-    marginLeft: 10,
-    flex: 1,
+
+  movieDetails: { 
+    marginLeft: 10, 
+    flex: 1 
   },
-  movieTitle: {
-    color: '#fff',
-    fontWeight: 'bold',
-    fontSize: 16,
+
+  movieTitle: { 
+    color: '#fff', 
+    fontWeight: 'bold', 
+    fontSize: 16 
   },
-  movieGenre: {
-    color: '#aaa',
-    fontSize: 12,
-    marginTop: 4,
+
+  movieGenre: { 
+    color: '#aaa', 
+    fontSize: 12, 
+    marginTop: 4 
   },
-  movieLocation: {
-    color: '#aaa',
-    fontSize: 12,
-    marginTop: 2,
+
+  movieLocation: { 
+    color: '#aaa', 
+    fontSize: 12, 
+    marginTop: 2 
   },
-  movieTime: {
-    color: '#aaa',
-    fontSize: 12,
-    marginTop: 2,
+
+  movieTime: { 
+    color: '#aaa', 
+    fontSize: 12, 
+    marginTop: 2 
   },
-  label: {
-    color: '#888',
-    fontSize: 14,
-    marginTop: 12,
+
+  label: { 
+    color: '#888', 
+    fontSize: 14, 
+    marginTop: 12 
   },
-  value: {
-    color: '#fff',
-    fontSize: 16,
-    marginBottom: 8,
+
+  value: { 
+    color: '#fff', 
+    fontSize: 16, 
+    marginBottom: 8 
   },
-  discountRow: {
-    flexDirection: 'row',
-    marginVertical: 10,
+
+  discountRow: { 
+    flexDirection: 'row', 
+    marginVertical: 10 
   },
-  discountInput: {
-    flex: 1,
-    backgroundColor: '#222',
-    color: '#fff',
-    padding: 10,
-    borderRadius: 8,
-    marginRight: 10,
+
+  discountInput: { 
+    flex: 1, 
+    backgroundColor: '#222', 
+    color: '#fff', 
+    padding: 10, 
+    borderRadius: 8, 
+    marginRight: 10 
   },
-  applyButton: {
-    backgroundColor: '#FFD700',
-    paddingHorizontal: 16,
-    borderRadius: 8,
-    justifyContent: 'center',
+
+  applyButton: { 
+    backgroundColor: '#FFD700', 
+    paddingHorizontal: 16, 
+    borderRadius: 8, 
+    justifyContent: 'center' 
   },
-  applyText: {
-    color: '#000',
-    fontWeight: 'bold',
+
+  applyText: { 
+    color: '#000', 
+    fontWeight: 'bold' 
   },
-  total: {
-    color: '#fff',
-    fontSize: 18,
-    marginVertical: 16,
-    fontWeight: 'bold',
+
+  total: { 
+    color: '#fff', 
+    fontSize: 18, 
+    marginVertical: 16, 
+    fontWeight: 'bold' 
   },
-  paymentMethod: {
-    backgroundColor: '#1a1a1a',
-    borderRadius: 12,
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 12,
-    marginBottom: 10,
+
+  paymentMethod: { 
+    backgroundColor: '#1a1a1a', 
+    borderRadius: 12, 
+    flexDirection: 'row', 
+    alignItems: 'center', 
+    padding: 12, 
+    marginBottom: 10 
   },
-  selectedMethod: {
-    borderWidth: 1,
-    borderColor: '#FFD700',
+
+  selectedMethod: { 
+    borderWidth: 1, 
+    borderColor: '#FFD700' 
   },
-  paymentIcon: {
-    width: 30,
-    height: 30,
-    resizeMode: 'contain',
-    marginRight: 10,
+
+  paymentIcon: { 
+    width: 30, 
+    height: 30, 
+    resizeMode: 'contain', 
+    marginRight: 10 
   },
-  paymentText: {
-    color: '#fff',
-    flex: 1,
-    fontSize: 16,
+
+  paymentText: { 
+    color: '#fff', 
+    flex: 1, 
+    fontSize: 16 
   },
-  timerContainer: {
-    marginTop: 20,
-    alignItems: 'center',
+
+  timerContainer: { 
+    marginTop: 20, 
+    alignItems: 'center' 
   },
-  timerText: {
-    color: '#aaa',
+
+  timerText: { 
+    color: '#aaa' 
   },
-  timerValue: {
-    color: '#FFD700',
-    fontSize: 18,
-    fontWeight: 'bold',
+
+  timerValue: { 
+    color: '#FFD700', 
+    fontSize: 18, 
+    fontWeight: 'bold' 
   },
-  continueButton: {
-    backgroundColor: '#FFD700',
-    margin: 16,
-    paddingVertical: 14,
-    borderRadius: 30,
-    marginBottom: 20,
-    alignItems: 'center',
+
+  continueButton: { 
+    backgroundColor: '#FFD700', 
+    margin: 16, 
+    paddingVertical: 14, 
+    borderRadius: 30, 
+    marginBottom: 20, 
+    alignItems: 'center' 
   },
-  continueText: {
-    fontWeight: 'bold',
-    fontSize: 16,
-    color: '#000',
+
+  continueText: { 
+    fontWeight: 'bold', 
+    fontSize: 16, 
+    color: '#000' 
   },
 });
 

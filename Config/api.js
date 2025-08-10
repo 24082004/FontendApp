@@ -17,14 +17,12 @@ const ENVIRONMENTS = {
 
 // Chọn môi trường hiện tại
 const CURRENT_ENV = __DEV__ ? 'development' : 'production';
-
-// Lấy config từ môi trường hiện tại
 const CONFIG = ENVIRONMENTS[CURRENT_ENV];
 
 // API cấu hình
 export const API_CONFIG = {
   BASE_URL: CONFIG.API_BASE_URL,
-  TIMEOUT: 10000, // 10 seconds
+  TIMEOUT: 10000,
 
   // Auth endpoints
   AUTH: {
@@ -48,13 +46,13 @@ export const API_CONFIG = {
   // Movie endpoints
   MOVIE: {
     LIST: `${CONFIG.API_BASE_URL}/movies`,
+    COMING_SOON: `${CONFIG.API_BASE_URL}/movies?status=coming-soon`,
+    NOW_SHOWING: `${CONFIG.API_BASE_URL}/movies?status=now-showing`,
     DETAIL: (id) => `${CONFIG.API_BASE_URL}/movies/${id}`,
     SEARCH: `${CONFIG.API_BASE_URL}/movies/search`,
     BY_GENRE: (genreId) => `${CONFIG.API_BASE_URL}/movies?genre=${genreId}`,
     BY_DIRECTOR: (directorId) => `${CONFIG.API_BASE_URL}/movies?director=${directorId}`,
     BY_ACTOR: (actorId) => `${CONFIG.API_BASE_URL}/movies?actor=${actorId}`,
-    NOW_SHOWING: `${CONFIG.API_BASE_URL}/movies?status=now-showing`,
-    COMING_SOON: `${CONFIG.API_BASE_URL}/movies?status=coming-soon`,
     POPULAR: `${CONFIG.API_BASE_URL}/movies?sort=-rate&limit=10`,
     LATEST: `${CONFIG.API_BASE_URL}/movies?sort=-release_date&limit=10`,
   },
@@ -66,10 +64,12 @@ export const API_CONFIG = {
   },
 };
 
-// Hàm xử lý ảnh (URL)
+// Hàm xử lý đường dẫn ảnh
 export const processImageUrl = (imageUrl, fallback = null) => {
   if (!imageUrl || imageUrl.trim() === '') {
-    return fallback || `https://picsum.photos/300/450?random=${Math.floor(Math.random() * 1000)}`;
+    return (
+      fallback || `https://picsum.photos/300/450?random=${Math.floor(Math.random() * 1000)}`
+    );
   }
 
   if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
@@ -89,7 +89,7 @@ export const DEFAULT_HEADERS = {
   Accept: 'application/json',
 };
 
-// Trạng thái API
+// Trạng thái API (HTTP Status Codes)
 export const API_STATUS = {
   SUCCESS: 200,
   CREATED: 201,
@@ -100,5 +100,4 @@ export const API_STATUS = {
   SERVER_ERROR: 500,
 };
 
-// Export mặc định
 export default API_CONFIG;
