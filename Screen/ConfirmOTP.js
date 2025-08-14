@@ -83,7 +83,7 @@ const ConfirmOTP = ({ navigation, route }) => {
         Alert.alert('Thành công', 'Xác thực thành công!', [
           {
             text: 'OK',
-            onPress: () => navigation.navigate('User'),
+            onPress: () => navigation.navigate('LogIn'),
           },
         ]);
       } else {
