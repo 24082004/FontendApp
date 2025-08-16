@@ -13,6 +13,7 @@ import TicketScreen from './Screen/TicketScreen';
 import MovieScreen from './Screen/MovieScreen';
 import MovieDetailScreen from './Screen/MovieDetailScreen';
 import SelectSeatScreen from './Screen/selectSeatScreen';
+import SelectFoodScreen from "./Screen/SelectFoodScreen";
 import PaymentScreen from './Screen/PaymentScreen';
 import MyTicket from './Screen/MyTicket';
 import ChangePasswordScreen from './Screen/ChangePasswordScreen';
@@ -126,6 +127,9 @@ export default function App() {
           <Stack.Screen name="EmployeeTabs" component={EmployeeTabs} />
           <Stack.Screen name="MainTabs" component={MainTabs} />
           <Stack.Screen name="MovieDetail" component={MovieDetailScreen} />
+          <Stack.Screen name="SelectFood" component={SelectFoodScreen} />
+          <Stack.Screen name="SelectSeat" component={SelectSeatScreen} />
+          <Stack.Screen name="PaymentScreen" component={PaymentScreen} /> 
           <Stack.Screen name="ChangePassword" component={ChangePasswordScreen} />
 
         </Stack.Navigator>
