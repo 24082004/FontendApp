@@ -18,6 +18,7 @@ import SelectFoodScreen from './Screen/SelectFoodScreen';
 import PaymentScreen from './Screen/PaymentScreen';
 import MyTicket from './Screen/MyTicket';
 import TicketScreen from './Screen/TicketScreen';
+import UserInfoScreen from './Screen/UserInfoScreen';
 import ChangePasswordScreen from './Screen/ChangePasswordScreen';
 
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
@@ -118,6 +119,7 @@ export default function App() {
           <Stack.Screen name="SelectSeat" component={SelectSeatScreen} />
           <Stack.Screen name="SelectFood" component={SelectFoodScreen} />
           <Stack.Screen name="PaymentScreen" component={PaymentScreen} />
+          <Stack.Screen name="UserInfo" component={UserInfoScreen} />
           <Stack.Screen name="MyTicket" component={MyTicket} />
         </Stack.Navigator>
       </NavigationContainer>
