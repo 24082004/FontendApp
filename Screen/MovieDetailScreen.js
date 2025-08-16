@@ -9,7 +9,7 @@ import {
   ImageBackground,
   ActivityIndicator,
 } from 'react-native';
-import { API_CONFIG } from '../\Config/api'; 
+import { API_CONFIG } from '../config/api'; 
 
 const BASE_URL = API_CONFIG.BASE_URL;
 

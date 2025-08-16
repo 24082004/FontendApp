@@ -10,7 +10,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { API_CONFIG, DEFAULT_HEADERS, processImageUrl, ERROR_MESSAGES } from '../Config/api';
+import { API_CONFIG, DEFAULT_HEADERS, processImageUrl, ERROR_MESSAGES } from '../config/api';
 import AuthService from '../Services/AuthService';
 import { useFocusEffect } from '@react-navigation/native';
 
