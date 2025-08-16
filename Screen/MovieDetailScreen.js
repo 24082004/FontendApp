@@ -13,12 +13,9 @@ import {
   Modal,
   FlatList,
 } from 'react-native';
-import { API_CONFIG } from '../config/api'; 
-
-const BASE_URL = API_CONFIG.BASE_URL;
 import { Ionicons } from '@expo/vector-icons';
 import WebView from 'react-native-webview';
-import { DEFAULT_HEADERS, processImageUrl, ERROR_MESSAGES } from '../config/api';
+import { API_CONFIG, DEFAULT_HEADERS, processImageUrl, ERROR_MESSAGES } from '../config/api';
 
 const MovieDetailScreen = ({ route, navigation }) => {
   const [loading, setLoading] = useState(false);
@@ -827,7 +824,7 @@ const navigateToSelectSeat = () => {
           styles.continueText,
           isComingSoon && styles.disabledContinueText
         ]}>
-          {isComingSoon ? `Khởi chiếu ${safeText(movie.releaseDate)}` : 'Tiếp Tục'}
+          {isComingSoon ? `Khởi chiếu ${safeText(movie.releaseDate)}` : 'Đặt vé'}
         </Text>
       </TouchableOpacity>
 

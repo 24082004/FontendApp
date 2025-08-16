@@ -3,15 +3,15 @@
 
 const ENVIRONMENTS = {
   development: {
-    API_BASE_URL: 'https://my-backend-api-movie.onrender.com/api',
-    // API_BASE_URL: 'http://10.0.2.2:3000/api', // Android Emulator
-    // API_BASE_URL: 'http://localhost:3000/api', // iOS Simulator
+    API_BASE_URL: "https://my-backend-api-movie.onrender.com/api", // IP máy local
+    // API_BASE_URL: 'http://10.0.2.2:3000/api',   // Android Emulator
+    // API_BASE_URL: 'http://localhost:3000/api',   // iOS Simulator
   },
   staging: {
-    API_BASE_URL: 'https://your-staging-api.com/api',
+    API_BASE_URL: "https://your-staging-api.com/api",
   },
   production: {
-    API_BASE_URL: 'https://your-production-api.com/api',
+    API_BASE_URL: "https://my-backend-api-movie.onrender.com/api",
   },
 };
 
