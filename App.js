@@ -13,14 +13,20 @@ import HomeScreen from './Screen/HomeScreen';
 import ProfileScreen from './Screen/ProfileScreen';
 import MovieScreen from './Screen/MovieScreen';
 import MovieDetailScreen from './Screen/MovieDetailScreen';
-import SelectSeatScreen from './Screen/SelectSeatScreen';
+import SelectSeatScreen from './Screen/selectSeatScreen';
 import SelectFoodScreen from './Screen/SelectFoodScreen';
 import PaymentScreen from './Screen/PaymentScreen';
+import PaymentConfirmScreen from './Screen/PaymentConfirmScreen';
 import MyTicket from './Screen/MyTicket';
 import TicketScreen from './Screen/TicketScreen';
 import UserInfoScreen from './Screen/UserInfoScreen';
 import ChangePasswordScreen from './Screen/ChangePasswordScreen';
 import EditProfileScreen from './Screen/EditProfileScreen';
+
+// Employee Screens  
+import QRScannerMain from './Screen/QRScannerMain';
+import ScanHistoryScreen from './Screen/ScanHistoryScreen';
+import EmployeeProfileScreen from './Screen/EmployeeProfileScreen';
 
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { NavigationContainer } from '@react-navigation/native';
@@ -29,7 +35,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Ionicons from '@expo/vector-icons/Ionicons';
 
 // Publishable Key thật từ Stripe Dashboard
-const STRIPE_PUBLISHABLE_KEY = "YOUR_STRIPE_KEY_HERE";
+const STRIPE_PUBLISHABLE_KEY = "pk_test_51RqG5GEjvRISyCrrtcJ058HwV1d5RHHwwwN519Rl2LXJgXVM2KhcNKqP0GVNgIHLgZmn0tGCOw8IoVcMV1T6AEjA00C5IyherM";
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -120,6 +126,7 @@ export default function App() {
           <Stack.Screen name="SelectSeat" component={SelectSeatScreen} />
           <Stack.Screen name="SelectFood" component={SelectFoodScreen} />
           <Stack.Screen name="PaymentScreen" component={PaymentScreen} />
+          <Stack.Screen name="PaymentConfirm" component={PaymentConfirmScreen} />
           <Stack.Screen name="UserInfo" component={UserInfoScreen} />
           <Stack.Screen name="EditProfileScreen" component={EditProfileScreen} />
           <Stack.Screen name="MyTicket" component={MyTicket} />

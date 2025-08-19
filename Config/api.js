@@ -1,33 +1,18 @@
 // config/api.js
 // Cấu hình môi trường
-
 const ENVIRONMENTS = {
-  development: {
-    API_BASE_URL: "https://my-backend-api-movie.onrender.com/api", // IP máy local
-    // API_BASE_URL: 'http://10.0.2.2:3000/api',   // Android Emulator
-    // API_BASE_URL: 'http://localhost:3000/api',   // iOS Simulator
+development: {
+    API_BASE_URL: 'https://my-backend-api-movie.onrender.com/api',
+    // API_BASE_URL: 'http://10.0.2.2:3000/api', // Android Emulator
+    // API_BASE_URL: 'http://localhost:3000/api', // iOS Simulator
   },
   staging: {
-    API_BASE_URL: "https://your-staging-api.com/api",
+    API_BASE_URL: 'https://your-staging-api.com/api',
   },
   production: {
-    API_BASE_URL: "https://my-backend-api-movie.onrender.com/api",
+    API_BASE_URL: 'https://your-production-api.com/api',
   },
 };
-
-// const ENVIRONMENTS = {
-//   development: {
-//     API_BASE_URL: "http://192.168.1.167:3000/api", // IP máy local
-//     // API_BASE_URL: 'http://10.0.2.2:3000/api',   // Android Emulator
-//     // API_BASE_URL: 'http://localhost:3000/api',   // iOS Simulator
-//   },
-//   staging: {
-//     API_BASE_URL: "https://your-staging-api.com/api",
-//   },
-//   production: {
-//     API_BASE_URL: "https://my-backend-api-movie.onrender.com/api",
-//   },
-// };
 
 // Chọn môi trường hiện tại
 const CURRENT_ENV = __DEV__ ? "development" : "production";
@@ -288,6 +273,15 @@ export const handleStripeError = (error) => {
 
   const message = error.message?.toLowerCase() || '';
 
+  // ✅ Handle user cancellation - không hiển thị lỗi
+  if (message.includes('người dùng đã hủy') || 
+      message.includes('user canceled') || 
+      message.includes('cancelled') || 
+      message.includes('canceled') ||
+      error.code === 'Canceled') {
+    return 'PAYMENT_CANCELLED'; // Special code để không hiển thị alert
+  }
+  
   if (message.includes('card was declined')) {
     return ERROR_MESSAGES.CARD_DECLINED;
   }
@@ -302,10 +296,6 @@ export const handleStripeError = (error) => {
   
   if (message.includes('invalid') && message.includes('card')) {
     return ERROR_MESSAGES.INVALID_CARD;
-  }
-  
-  if (message.includes('cancelled')) {
-    return ERROR_MESSAGES.PAYMENT_CANCELLED;
   }
   
   if (message.includes('stripe')) {
