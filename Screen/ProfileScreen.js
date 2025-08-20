@@ -98,7 +98,7 @@ const ProfileScreen = ({ navigation }) => {
   // Handle Edit Profile
   const handleEditProfile = () => {
     if (profile && profile.data) {
-      navigation.navigate('EditProfile', { 
+      navigation.navigate('EditProfileScreen', { 
         profileData: profile.data 
       });
     }

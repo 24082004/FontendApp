@@ -13,7 +13,7 @@ import HomeScreen from './Screen/HomeScreen';
 import ProfileScreen from './Screen/ProfileScreen';
 import MovieScreen from './Screen/MovieScreen';
 import MovieDetailScreen from './Screen/MovieDetailScreen';
-import SelectSeatScreen from './Screen/selectSeatScreen';
+import SelectSeatScreen from './Screen/SelectSeatScreen';
 import SelectFoodScreen from './Screen/SelectFoodScreen';
 import PaymentScreen from './Screen/PaymentScreen';
 import PaymentConfirmScreen from './Screen/PaymentConfirmScreen';
