@@ -476,7 +476,7 @@ const PaymentScreen = ({ route, navigation }) => {
       timeRemaining: timeLeft
     };
 
-    navigation.navigate('UserInfo', paymentData);
+    navigation.navigate('UserInfoScreen', paymentData);
   };
 
   return (
