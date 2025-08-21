@@ -473,10 +473,15 @@ const handleBuyTicket = async () => {
 
   const formatShowtime = (showtime) => {
     try {
+      // Lấy datetime gốc từ API
       const showtimeDateTime = createShowtimeDateTime(showtime.date, showtime.time);
+      
+      // Cộng thêm 7 giờ
+      const adjustedDateTime = new Date(showtimeDateTime.getTime() + 7 * 60 * 60 * 1000);
+
       return {
-        date: new Date(showtime.date).toLocaleDateString('vi-VN'),
-        time: showtimeDateTime.toLocaleTimeString('vi-VN', { 
+        date: adjustedDateTime.toLocaleDateString('vi-VN'),
+        time: adjustedDateTime.toLocaleTimeString('vi-VN', { 
           hour: '2-digit', 
           minute: '2-digit',
           hour12: false
@@ -493,6 +498,7 @@ const handleBuyTicket = async () => {
       };
     }
   };
+
 
   const getGroupedShowtimes = () => {
     const grouped = {};

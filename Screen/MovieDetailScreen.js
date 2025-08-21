@@ -828,7 +828,6 @@ const navigateToSelectSeat = () => {
         </Text>
       </TouchableOpacity>
 
-      {/* Modal chọn rạp chiếu - chỉ hiển thị cho phim đang chiếu */}
       {!isComingSoon && (
         <Modal
           animationType="slide"
