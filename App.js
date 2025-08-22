@@ -135,7 +135,6 @@ export default function App() {
           <Stack.Screen name="MainTabs" component={MainTabs} />
           <Stack.Screen name="MovieDetail" component={MovieDetailScreen} />
           <Stack.Screen name="ChangePassword" component={ChangePasswordScreen} />
-          <Stack.Screen name="EditProfile" component={EditProfileScreen} />
           <Stack.Screen name="SelectSeat" component={SelectSeatScreen} />
           <Stack.Screen name="SelectFood" component={SelectFoodScreen} />
           <Stack.Screen name="PaymentScreen" component={PaymentScreen} />

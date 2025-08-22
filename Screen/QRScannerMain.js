@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -7,123 +7,106 @@ import {
   Alert,
   SafeAreaView,
   StatusBar,
-} from 'react-native';
-import { Camera } from 'expo-camera';
-import { Ionicons } from '@expo/vector-icons';
+} from "react-native";
+import { CameraView, useCameraPermissions } from "expo-camera";
+import { Ionicons } from "@expo/vector-icons";
+import { useIsFocused } from "@react-navigation/native";
 
 const QRScannerMain = ({ navigation }) => {
-  const [hasPermission, setHasPermission] = useState(null);
+  const [permission, requestPermission] = useCameraPermissions();
   const [scanned, setScanned] = useState(false);
   const [flashOn, setFlashOn] = useState(false);
+  const isFocused = useIsFocused(); // ✅ check màn hình có đang focus
 
-  useEffect(() => {
-    (async () => {
-      const { status } = await Camera.requestCameraPermissionsAsync();
-      setHasPermission(status === 'granted');
-    })();
-  }, []);
-
-  const handleBarCodeScanned = ({ type, data }) => {
-    setScanned(true);
-    
-    try {
-      // Parse QR code data (expecting JSON with ticket info)
-      const ticketData = JSON.parse(data);
-      
-      Alert.alert(
-        'QR Code Scanned',
-        `Ticket ID: ${ticketData.ticketId}\nMovie: ${ticketData.movieTitle}`,
-        [
-          {
-            text: 'Scan Again',
-            onPress: () => setScanned(false),
-          },
-          {
-            text: 'View Details',
-            onPress: () => {
-              // Navigate to ticket details or process the scan
-              navigation.navigate('ScanHistory', { newScan: ticketData });
-            },
-          },
-        ]
-      );
-    } catch (error) {
-      Alert.alert(
-        'Invalid QR Code',
-        'This QR code is not a valid ticket.',
-        [
-          {
-            text: 'Scan Again',
-            onPress: () => setScanned(false),
-          },
-        ]
-      );
-    }
-  };
-
-  if (hasPermission === null) {
+  if (!permission) {
     return (
-      <View style={styles.container}>
-        <Text style={styles.text}>Requesting camera permission...</Text>
+      <View style={styles.centered}>
+        <Text style={styles.text}>Đang yêu cầu quyền truy cập camera...</Text>
       </View>
     );
   }
 
-  if (hasPermission === false) {
+  if (!permission.granted) {
     return (
-      <View style={styles.container}>
-        <Text style={styles.text}>No access to camera</Text>
-        <TouchableOpacity
-          style={styles.button}
-          onPress={() => Camera.requestCameraPermissionsAsync()}
-        >
-          <Text style={styles.buttonText}>Grant Permission</Text>
+      <View style={styles.centered}>
+        <Text style={styles.text}>Bạn chưa cấp quyền camera</Text>
+        <TouchableOpacity style={styles.button} onPress={requestPermission}>
+          <Text style={styles.buttonText}>Cấp quyền</Text>
         </TouchableOpacity>
       </View>
     );
   }
 
+  const handleBarCodeScanned = ({ data }) => {
+    setScanned(true);
+
+    try {
+      const ticketData = JSON.parse(data);
+
+      Alert.alert(
+        "Đã quét mã",
+        `Mã vé: ${ticketData.ticketId}\nPhim: ${ticketData.movieTitle}`,
+        [
+          { text: "Quét lại", onPress: () => setScanned(false) },
+          {
+            text: "Xem chi tiết",
+            onPress: () =>
+              navigation.navigate("ScanHistory", { newScan: ticketData }),
+          },
+        ]
+      );
+    } catch (error) {
+      Alert.alert("QR Code không hợp lệ", "Mã này không phải vé hợp lệ.", [
+        { text: "Thử lại", onPress: () => setScanned(false) },
+      ]);
+    }
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="light-content" />
-      
+
+      {/* Header */}
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Quét mã QR vé</Text>
         <TouchableOpacity
           style={styles.flashButton}
           onPress={() => setFlashOn(!flashOn)}
         >
-          <Ionicons 
-            name={flashOn ? 'flash' : 'flash-off'} 
-            size={24} 
-            color="#fff" 
+          <Ionicons
+            name={flashOn ? "flash" : "flash-off"}
+            size={24}
+            color="#fff"
           />
         </TouchableOpacity>
       </View>
 
-      <Camera
-        style={styles.camera}
-        type={Camera.Constants.Type.back}
-        flashMode={flashOn ? Camera.Constants.FlashMode.torch : Camera.Constants.FlashMode.off}
-        onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
-        barCodeScannerSettings={{
-          barCodeTypes: ['qr'],
-        }}
-      >
-        <View style={styles.overlay}>
-          <View style={styles.scanFrame}>
-            <View style={styles.corner} />
-            <View style={[styles.corner, styles.topRight]} />
-            <View style={[styles.corner, styles.bottomLeft]} />
-            <View style={[styles.corner, styles.bottomRight]} />
-          </View>
-          
-          <Text style={styles.instruction}>
-            Đặt mã QR vào trong khung để quét
-          </Text>
-        </View>
-      </Camera>
+      {/* Camera chỉ bật khi màn hình focus */}
+      {isFocused && (
+        <CameraView
+          style={styles.camera}
+          facing="back"
+          enableTorch={flashOn}
+          onBarcodeScanned={scanned ? undefined : handleBarCodeScanned}
+          barcodeScannerSettings={{ barcodeTypes: ["qr"] }}
+        >
+          {/* Overlay khung quét */}
+          <View style={styles.overlay}>
+            <View style={styles.scanFrame}>
+              <View style={styles.corner} />
+              <View style={[styles.corner, styles.topRight]} />
+              <View style={[styles.corner, styles.bottomLeft]} />
+              <View style={[styles.corner, styles.bottomRight]} />
+            </View>
 
+            <Text style={styles.instruction}>
+              Đặt mã QR vào trong khung để quét
+            </Text>
+          </View>
+        </CameraView>
+      )}
+
+      {/* Footer */}
       <View style={styles.footer}>
         {scanned && (
           <TouchableOpacity
@@ -140,97 +123,83 @@ const QRScannerMain = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
-  container: {
+  container: { flex: 1, backgroundColor: "#000" },
+  centered: {
     flex: 1,
-    backgroundColor: '#000',
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#000",
   },
   header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     paddingHorizontal: 20,
     paddingVertical: 15,
-    backgroundColor: 'rgba(0,0,0,0.8)',
+    backgroundColor: "rgba(0,0,0,0.8)",
   },
-  headerTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#fff',
-  },
-  flashButton: {
-    padding: 10,
-  },
-  camera: {
-    flex: 1,
-  },
+  headerTitle: { fontSize: 18, fontWeight: "bold", color: "#fff" },
+  flashButton: { padding: 10 },
+  camera: { flex: 1 },
   overlay: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "transparent",
   },
   scanFrame: {
     width: 250,
     height: 250,
-    position: 'relative',
+    position: "relative",
   },
   corner: {
-    position: 'absolute',
+    position: "absolute",
     width: 30,
     height: 30,
-    borderColor: '#FFD700',
+    borderColor: "#FFD700",
     borderWidth: 3,
-    borderTopLeftRadius: 5,
-    top: 0,
-    left: 0,
     borderRightWidth: 0,
     borderBottomWidth: 0,
+    top: 0,
+    left: 0,
   },
   topRight: {
     top: 0,
     right: 0,
-    left: 'auto',
+    left: "auto",
     borderLeftWidth: 0,
-    borderRightWidth: 3,
-    borderTopRightRadius: 5,
     borderTopLeftRadius: 0,
   },
   bottomLeft: {
     bottom: 0,
-    top: 'auto',
+    top: "auto",
     borderTopWidth: 0,
-    borderBottomWidth: 3,
-    borderBottomLeftRadius: 5,
     borderTopLeftRadius: 0,
   },
   bottomRight: {
     bottom: 0,
     right: 0,
-    top: 'auto',
-    left: 'auto',
+    top: "auto",
+    left: "auto",
     borderTopWidth: 0,
     borderLeftWidth: 0,
-    borderRightWidth: 3,
-    borderBottomWidth: 3,
-    borderBottomRightRadius: 5,
-    borderTopLeftRadius: 0,
   },
   instruction: {
     marginTop: 40,
     fontSize: 16,
-    color: '#fff',
-    textAlign: 'center',
+    color: "#fff",
+    textAlign: "center",
     paddingHorizontal: 40,
   },
   footer: {
     padding: 20,
-    backgroundColor: 'rgba(0,0,0,0.8)',
-    alignItems: 'center',
+    backgroundColor: "rgba(0,0,0,0.8)",
+    alignItems: "center",
   },
   scanAgainButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#FFD700',
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#FFD700",
     paddingHorizontal: 20,
     paddingVertical: 12,
     borderRadius: 25,
@@ -238,26 +207,18 @@ const styles = StyleSheet.create({
   scanAgainText: {
     marginLeft: 8,
     fontSize: 16,
-    fontWeight: 'bold',
-    color: '#000',
+    fontWeight: "bold",
+    color: "#000",
   },
-  text: {
-    fontSize: 16,
-    color: '#fff',
-    textAlign: 'center',
-  },
+  text: { fontSize: 16, color: "#fff", textAlign: "center" },
   button: {
-    backgroundColor: '#FFD700',
+    backgroundColor: "#FFD700",
     paddingHorizontal: 20,
     paddingVertical: 12,
     borderRadius: 8,
     marginTop: 20,
   },
-  buttonText: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#000',
-  },
+  buttonText: { fontSize: 16, fontWeight: "bold", color: "#000" },
 });
 
 export default QRScannerMain;
