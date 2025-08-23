@@ -476,9 +476,7 @@ const MyTicket = ({ route, navigation }) => {
   const renderHeader = () => (
     <SafeAreaView style={styles.safeAreaHeader}>
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-          <Icon name="arrow-back" size={24} color="#fff" />
-        </TouchableOpacity>
+        <View style={{ width: 40, height: 40 }} />
         <Text style={styles.headerTitle}>Vé điện tử</Text>
         <View style={styles.headerActions}>
           {ticketData && canCancelTicket(ticketData.status) && (

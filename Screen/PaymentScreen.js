@@ -246,17 +246,37 @@ const PaymentScreen = ({ route, navigation }) => {
   const loadAvailableDiscounts = async () => {
     try {
       const discountsUrl = API_CONFIG.DISCOUNT.LIST;
-      
       const result = await apiCall(discountsUrl);
 
       if (result.success && result.data) {
         const currentCinemaId = cinema?._id || showtime?.cinema?._id;
         
         const filteredDiscounts = result.data.filter(discount => {
-          return !discount.cinema || discount.cinema._id === currentCinemaId;
+          // If discount has no cinema restriction (empty array or null), it's applicable everywhere
+          if (!discount.cinema || 
+              (Array.isArray(discount.cinema) && discount.cinema.length === 0)) {
+            return true;
+          }
+          
+          // If discount has cinema restriction, check if current cinema matches
+          if (Array.isArray(discount.cinema)) {
+            return discount.cinema.some(c => c._id === currentCinemaId);
+          }
+          
+          // If discount.cinema is an object (single cinema)
+          if (typeof discount.cinema === 'object' && discount.cinema._id) {
+            return discount.cinema._id === currentCinemaId;
+          }
+          
+          return false;
         });
 
         setAvailableDiscounts(filteredDiscounts);
+      } else {
+        // Thử với format khác nếu API trả về trực tiếp array
+        if (Array.isArray(result)) {
+          setAvailableDiscounts(result);
+        }
       }
     } catch (error) {
       // Không hiển thị lỗi cho user vì đây không phải tính năng bắt buộc

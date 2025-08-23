@@ -1003,27 +1003,14 @@ const PaymentConfirmScreen = ({ route, navigation }) => {
             </View>
           </View>
 
-          {/* Primary button - Just close modal and stay */}
-          <TouchableOpacity style={styles.successButton} onPress={handleCloseModal}>
-            <View style={styles.successButtonGradient}>
-              <Icon name="checkmark" size={20} color="#000" style={{ marginRight: 8 }} />
-              <Text style={styles.successButtonText}>Hoàn tất</Text>
-            </View>
-          </TouchableOpacity>
-
-          {/* Secondary button - Navigate to MyTicket if exists */}
+          {/* Primary button - Navigate to MyTicket */}
           <TouchableOpacity 
-            style={[styles.successButton, { 
-              backgroundColor: 'transparent', 
-              borderWidth: 1, 
-              borderColor: '#FDC536', 
-              marginTop: 12 
-            }]} 
+            style={styles.successButton} 
             onPress={handleSuccessComplete}
           >
             <View style={styles.successButtonGradient}>
-              <Icon name="ticket" size={20} color="#FDC536" style={{ marginRight: 8 }} />
-              <Text style={[styles.successButtonText, { color: '#FDC536' }]}>Xem vé của tôi</Text>
+              <Icon name="ticket" size={20} color="#000" style={{ marginRight: 8 }} />
+              <Text style={styles.successButtonText}>Xem vé của tôi</Text>
             </View>
           </TouchableOpacity>
 
