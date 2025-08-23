@@ -6,28 +6,17 @@ import { Ionicons } from '@expo/vector-icons';
 import { API_CONFIG, DEFAULT_HEADERS, processImageUrl } from '../config/api';
 
 const MovieScreen = ({ route, navigation }) => {
-  // Nhận dữ liệu từ route params (nếu có)
   const { nowShowingMovies = [], comingSoonMovies = [], initialTab = 'Đang chiếu' } = route.params || {};
-  
-  // State cho tab hiện tại
   const [activeTab, setActiveTab] = useState(initialTab);
-  
-  // State cho dữ liệu phim
   const [movies, setMovies] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-
-  // State cho dữ liệu gốc từ API hoặc route params
   const [originalNowShowingMovies, setOriginalNowShowingMovies] = useState(nowShowingMovies);
   const [originalComingSoonMovies, setOriginalComingSoonMovies] = useState(comingSoonMovies);
-
-  // Fetch dữ liệu phim từ API (giống như HomeScreen)
   const fetchMovies = async () => {
     try {
       setLoading(true);
       setError(null);
-
-      // Sử dụng cùng endpoint như HomeScreen
       const response = await fetch(API_CONFIG.MOVIE.LIST, {
         method: 'GET',
         headers: DEFAULT_HEADERS,
@@ -42,24 +31,16 @@ const MovieScreen = ({ route, navigation }) => {
       
       if (result.success && result.data) {
         const currentDate = new Date();
-        
-        // Xử lý dữ liệu giống như HomeScreen
         const processedMovies = result.data.map(movie => {
           const processedMovie = {
             ...movie,
             image: processImageUrl(movie.image),
-            
-            // Xử lý genre names
             genreNames: movie.genre?.map(g => {
               return typeof g === 'object' ? g.name : g;
             }) || [],
-            
-            // Xử lý director names
             directorNames: movie.director?.map(d => {
               return typeof d === 'object' ? d.name : d;
             }) || [],
-            
-            // Xử lý actor names
             actorNames: movie.actor?.map(a => {
               return typeof a === 'object' ? a.name : a;
             }) || [],
@@ -69,8 +50,6 @@ const MovieScreen = ({ route, navigation }) => {
 
           return processedMovie;
         });
-
-        // Phân loại phim giống như HomeScreen
         const nowShowingData = processedMovies.filter(movie => 
           new Date(movie.release_date) <= currentDate
         );
@@ -78,12 +57,8 @@ const MovieScreen = ({ route, navigation }) => {
         const comingSoonData = processedMovies.filter(movie => 
           new Date(movie.release_date) > currentDate
         );
-
-        // Cập nhật state với dữ liệu mới
         setOriginalNowShowingMovies(nowShowingData);
         setOriginalComingSoonMovies(comingSoonData);
-
-        // Cập nhật movies hiện tại dựa trên tab đang active
         const currentMovies = activeTab === 'Đang chiếu' ? nowShowingData : comingSoonData;
         setMovies(formatMoviesData(currentMovies));
 
@@ -97,8 +72,6 @@ const MovieScreen = ({ route, navigation }) => {
       setLoading(false);
     }
   };
-
-  // Định dạng dữ liệu phim
   const formatMoviesData = (moviesData) => {
     if (!Array.isArray(moviesData)) {
       return [];
@@ -114,33 +87,25 @@ const MovieScreen = ({ route, navigation }) => {
       image: processImageUrl(movie.image) || 'https://via.placeholder.com/300x450?text=No+Image',
       releaseDate: movie.release_date ? 
         new Date(movie.release_date).toLocaleDateString('vi-VN') : 'Đang cập nhật',
-      originalData: movie // Lưu dữ liệu gốc để navigate
+      originalData: movieCard
     }));
   };
-
-  // Fetch dữ liệu khi component mount
   useEffect(() => {
-    // Nếu không có dữ liệu từ route params, fetch từ API
     if (originalNowShowingMovies.length === 0 && originalComingSoonMovies.length === 0) {
       fetchMovies();
     } else {
-      // Nếu có dữ liệu từ route params, sử dụng ngay
       const initialMovies = activeTab === 'Đang chiếu' ? 
         formatMoviesData(originalNowShowingMovies) : 
         formatMoviesData(originalComingSoonMovies);
       setMovies(initialMovies);
     }
   }, []);
-
-  // Cập nhật dữ liệu khi tab thay đổi
   useEffect(() => {
     const moviesData = activeTab === 'Đang chiếu' ? 
       originalNowShowingMovies : originalComingSoonMovies;
     
     setMovies(formatMoviesData(moviesData));
   }, [activeTab, originalNowShowingMovies, originalComingSoonMovies]);
-
-  // Navigate to movie detail
   const navigateToMovieDetail = (movie) => {
     const originalMovie = movie.originalData;
 

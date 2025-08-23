@@ -222,10 +222,7 @@ const navigateToSelectSeat = () => {
   }
 
   navigation.navigate('SelectSeat', {
-    // ✅ QUAN TRỌNG: Thêm movieId
     movieId: movieId || movie._id || movie.id,
-    
-    // Thông tin phim
     movieTitle: movie.title || movie.name,
     duration: movie.duration,
     releaseDate: movie.releaseDate,
@@ -237,8 +234,6 @@ const navigateToSelectSeat = () => {
     
   });
 };
-
-  // Thêm hàm xử lý YouTube URL
   const getYouTubeEmbedUrl = (url) => {
     if (!url) return null;
     
@@ -1202,8 +1197,6 @@ const styles = StyleSheet.create({
     fontSize: 12,
     marginRight: 4,
   },
-  
-  // Modal styles cho chọn rạp
   modalContainer: {
     flex: 1,
     justifyContent: 'flex-end',
@@ -1266,7 +1259,6 @@ const styles = StyleSheet.create({
     padding: 20,
   },
 
-  // Styles cho TrailerModal - đặt tên khác để tránh conflict
   trailerModalContainer: {
     flex: 1,
     backgroundColor: '#000',

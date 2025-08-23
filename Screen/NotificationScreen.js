@@ -410,7 +410,6 @@ export default function NotificationScreen({ navigation }) {
     return true;
   });
 
-  // Render notification item
   const renderNotificationItem = (notification) => (
     <TouchableOpacity
       key={notification.id}

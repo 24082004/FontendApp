@@ -446,7 +446,7 @@ const PaymentScreen = ({ route, navigation }) => {
       Alert.alert(
         'Hết thời gian',
         'Phiên đặt vé đã hết hạn. Vui lòng đặt lại.',
-        [{ text: 'OK', onPress: () => navigation.navigate('Home') }]
+        [{ text: 'OK', onPress: () => navigation.navigate('MainTabs') }]
       );
       return;
     }

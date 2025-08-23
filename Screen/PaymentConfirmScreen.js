@@ -540,7 +540,7 @@ const PaymentConfirmScreen = ({ route, navigation }) => {
       // Navigate to main screen or reset navigation stack
       navigation.reset({
         index: 0,
-        routes: [{ name: 'Home' }], // Replace 'Home' with your main screen name
+        routes: [{ name: 'MainTabs' }],
       });
     } catch (error) {
       // Fallback to goBack if reset fails
@@ -1026,8 +1026,6 @@ const PaymentConfirmScreen = ({ route, navigation }) => {
               <Text style={[styles.successButtonText, { color: '#FDC536' }]}>Xem vé của tôi</Text>
             </View>
           </TouchableOpacity>
-
-          {/* Tertiary button - Navigate to Home */}
           <TouchableOpacity 
             style={{ marginTop: 16 }}
             onPress={handleSuccessCompleteToHome}
@@ -1072,16 +1070,9 @@ const PaymentConfirmScreen = ({ route, navigation }) => {
     </SafeAreaView>
   );
 
-  // ================================
-  // MAIN RENDER
-  // ================================
-  
-  // Show loading state while validating seats
   if (validatingSeats) {
     return renderLoadingState();
   }
-
-  // Show empty state if no booking data
   const hasValidData = bookingData.movieTitle && 
                       bookingData.selectedSeats?.length > 0 && 
                       bookingData.totalPrice > 0;

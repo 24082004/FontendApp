@@ -516,7 +516,7 @@ const UserInfoScreen = ({ route, navigation }) => {
             </View>
             
             <Text style={styles.formSubtitle}>
-              Vui lòng nhập thông tin chính xác để nhận vé và thông báo
+              Xác nhận thông tin chính xác
             </Text>
 
             {/* Full Name */}
@@ -529,6 +529,7 @@ const UserInfoScreen = ({ route, navigation }) => {
                 placeholder="Nhập họ và tên đầy đủ"
                 placeholderTextColor="#666"
                 value={fullName}
+                editable={false}
                 onChangeText={(text) => {
                   setFullName(text);
                   if (errors.fullName) {
@@ -556,6 +557,7 @@ const UserInfoScreen = ({ route, navigation }) => {
                 placeholder="Nhập địa chỉ email"
                 placeholderTextColor="#666"
                 value={email}
+                editable={false}
                 onChangeText={(text) => {
                   setEmail(text.toLowerCase().trim());
                   if (errors.email) {
@@ -591,6 +593,7 @@ const UserInfoScreen = ({ route, navigation }) => {
                 placeholder="VD: 0912345678 hoặc 84912345678"
                 placeholderTextColor="#666"
                 value={phone}
+                editable={false}
                 onChangeText={(text) => {
                   const formatted = formatPhoneInput(text);
                   setPhone(formatted);
@@ -615,22 +618,7 @@ const UserInfoScreen = ({ route, navigation }) => {
                 </View>
               )}
             </View>
-
-            {/* Save Info Checkbox */}
-            <TouchableOpacity 
-              style={styles.checkboxContainer}
-              onPress={() => setSaveInfo(!saveInfo)}
-            >
-              <View style={[styles.checkbox, saveInfo && styles.checkboxChecked]}>
-                {saveInfo && <Ionicons name="checkmark" size={16} color="#000" />}
-              </View>
-              <Text style={styles.checkboxText}>
-                Lưu thông tin cho lần đặt vé tiếp theo
-              </Text>
-            </TouchableOpacity>
           </View>
-
-          {/* Terms and Conditions */}
           <View style={styles.termsCard}>
             <View style={styles.termsHeader}>
               <Ionicons name="shield-checkmark" size={16} color="#888" />
