@@ -11,7 +11,7 @@ import {
   SafeAreaView
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { API_CONFIG, buildApiUrl, DEFAULT_HEADERS, handleApiError, processImageUrl } from '../config/api';
+import { API_CONFIG, DEFAULT_HEADERS, handleApiError, processImageUrl } from '../config/api';
 
 export default function SelectFoodScreen({ route, navigation }) {
   // States for food data

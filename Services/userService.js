@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE_URL = 'https://my-backend-api-movie.onrender.com/api';
+const API_BASE_URL = 'https://my-backend-api-movie.vercel.app/api';
 
 export const getProfile = async (token) => {
   try {

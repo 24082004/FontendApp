@@ -334,57 +334,61 @@ const navigateToMovieDetail = (movie) => {
   );
 
   return (
-    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-      {/* Header với biểu tượng thông báo */}
-      <View style={styles.header}>
-        <View style={styles.greetingContainer}>
-          <Text style={styles.greeting}>Chào mừng đến với</Text>
-          <Text style={styles.appName}>PoLyCinema</Text>
-        </View>
-        
-        {/* Biểu tượng thông báo - chỉ hiển thị khi đã đăng nhập */}
-        {isLoggedIn && (
-          <View style={styles.notificationContainer}>
-            {/* Manual refresh button */}
-            <TouchableOpacity 
-              style={[styles.refreshNotificationButton, refreshingNotifications && styles.refreshing]}
-              onPress={refreshNotificationCount}
-              disabled={refreshingNotifications}
-            >
-              <Ionicons 
-                name="refresh" 
-                size={16} 
-                color={refreshingNotifications ? "#888" : "#FFD700"} 
-                style={refreshingNotifications ? styles.spinning : null}
-              />
-            </TouchableOpacity>
-            
-            <TouchableOpacity 
-              style={styles.notificationButton}
-              onPress={navigateToNotification}
-            >
-              <Ionicons name="notifications-outline" size={24} color="#fff" />
-              {notificationCount > 0 && (
-                <View style={styles.notificationBadge}>
-                  <Text style={styles.notificationBadgeText}>
-                    {notificationCount > 99 ? '99+' : notificationCount}
-                  </Text>
-                </View>
-              )}
-            </TouchableOpacity>
-          </View>
-        )}
-        
-        {/* Nếu chưa đăng nhập, hiển thị nút đăng nhập */}
-        {!isLoggedIn && (
-          <TouchableOpacity 
-            style={styles.loginButton}
-            onPress={() => navigation.navigate('Login')}
-          >
-            <Ionicons name="person-outline" size={24} color="#fff" />
-          </TouchableOpacity>
-        )}
+  <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+  <View style={styles.header}>
+    <View style={styles.greetingContainer}>
+      <Text style={styles.greeting}>Chào mừng đến với</Text>
+      <Text style={styles.appName}>PoLyCinema</Text>
+    </View>
+    
+    {/* Biểu tượng thông báo - chỉ hiển thị khi đã đăng nhập */}
+    {isLoggedIn && (
+      <View style={styles.notificationContainer}>
+        {/* Refresh Button (gộp thành 1 icon) */}
+        <TouchableOpacity 
+          style={styles.iconRefreshButton} 
+          onPress={async () => {
+            await fetchMovies();
+            if (isLoggedIn) {
+              await refreshNotificationCount();
+            }
+          }}
+          disabled={loading || refreshingNotifications}
+        >
+          <Ionicons 
+            name="refresh" 
+            size={20} 
+            color={loading || refreshingNotifications ? "#888" : "#FFD700"} 
+          />
+        </TouchableOpacity>
+
+        <TouchableOpacity 
+          style={styles.notificationButton}
+          onPress={navigateToNotification}
+        >
+          <Ionicons name="notifications-outline" size={24} color="#fff" />
+          {notificationCount > 0 && (
+            <View style={styles.notificationBadge}>
+              <Text style={styles.notificationBadgeText}>
+                {notificationCount > 99 ? '99+' : notificationCount}
+              </Text>
+            </View>
+          )}
+        </TouchableOpacity>
       </View>
+    )}
+    
+    {/* Nếu chưa đăng nhập, hiển thị nút đăng nhập */}
+    {!isLoggedIn && (
+      <TouchableOpacity 
+        style={styles.loginButton}
+        onPress={() => navigation.navigate('Login')}
+      >
+        <Ionicons name="person-outline" size={24} color="#fff" />
+      </TouchableOpacity>
+    )}
+  </View>
+
 
       {/* Now Showing Section */}
       <View style={styles.section}>
@@ -418,7 +422,7 @@ const navigateToMovieDetail = (movie) => {
       {/* Coming Soon Section */}
       <View style={styles.section}>
         <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>🔜 Sắp chiếu</Text>
+          <Text style={styles.sectionTitle}>🔜 Sắp ra mắt</Text>
           <TouchableOpacity onPress={() => navigateToMovieScreen('comingSoon')}>
             <Text style={styles.seeAll}>Xem tất cả</Text>
           </TouchableOpacity>
@@ -442,64 +446,6 @@ const navigateToMovieDetail = (movie) => {
             comingSoon.map(renderComingSoonItem)
           )}
         </ScrollView>
-      </View>
-
-      {/* Featured/Promotional Section */}
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>🏆 Nổi bật</Text>
-        <View style={styles.featuredContainer}>
-          <TouchableOpacity style={styles.featuredItem}>
-            <View style={styles.featuredIcon}>
-              <Ionicons name="trophy" size={24} color="#FFD700" />
-            </View>
-            <Text style={styles.featuredText}>Phim hay nhất</Text>
-          </TouchableOpacity>
-          
-          <TouchableOpacity style={styles.featuredItem}>
-            <View style={styles.featuredIcon}>
-              <Ionicons name="trending-up" size={24} color="#FF6B6B" />
-            </View>
-            <Text style={styles.featuredText}>Xu hướng</Text>
-          </TouchableOpacity>
-          
-          <TouchableOpacity style={styles.featuredItem}>
-            <View style={styles.featuredIcon}>
-              <Ionicons name="ticket" size={24} color="#4ECDC4" />
-            </View>
-            <Text style={styles.featuredText}>Ưu đãi</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-
-      {/* Refresh Button */}
-      <View style={styles.refreshContainer}>
-        <TouchableOpacity style={styles.refreshButton} onPress={fetchMovies}>
-          <Ionicons name="refresh" size={20} color="#000" />
-          <Text style={styles.refreshText}>Làm mới dữ liệu</Text>
-        </TouchableOpacity>
-        
-        {/* Hiển thị trạng thái đăng nhập */}
-        <Text style={styles.authStatus}>
-          {isLoggedIn ? '✅ Đã đăng nhập' : '⚪ Chưa đăng nhập'}
-        </Text>
-        
-        {/* Notification refresh button for logged in users */}
-        {isLoggedIn && (
-          <TouchableOpacity 
-            style={styles.notificationRefreshButton} 
-            onPress={refreshNotificationCount}
-            disabled={refreshingNotifications}
-          >
-            <Ionicons 
-              name="notifications" 
-              size={16} 
-              color={refreshingNotifications ? "#888" : "#FFD700"} 
-            />
-            <Text style={[styles.notificationRefreshText, refreshingNotifications && styles.refreshingText]}>
-              {refreshingNotifications ? 'Đang cập nhật...' : 'Cập nhật thông báo'}
-            </Text>
-          </TouchableOpacity>
-        )}
       </View>
     </ScrollView>
   );
@@ -791,5 +737,15 @@ const styles = StyleSheet.create({
   },
   refreshingText: {
     color: '#888',
+  },
+  iconRefreshButton: {
+  padding: 7,
+  borderRadius: 30,
+  backgroundColor: 'rgba(255, 215, 0, 0.1)',
+  justifyContent: 'center',
+  alignItems: 'center',
+  borderWidth: 1,
+  marginRight: 10,
+  borderColor: 'rgba(255, 215, 0, 0.3)',
   },
 });

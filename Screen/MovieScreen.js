@@ -83,13 +83,14 @@ const MovieScreen = ({ route, navigation }) => {
       rating: `${movie.rate || '0'} (${movie.votes || '0'})`,
       duration: movie.durationFormatted || movie.duration || 'Đang cập nhật',
       genres: movie.genreNames?.join(', ') || 
-               (Array.isArray(movie.genre) ? movie.genre.map(g => g.name || g).join(', ') : 'Đang cập nhật'),
+              (Array.isArray(movie.genre) ? movie.genre.map(g => g.name || g).join(', ') : 'Đang cập nhật'),
       image: processImageUrl(movie.image) || 'https://via.placeholder.com/300x450?text=No+Image',
       releaseDate: movie.release_date ? 
         new Date(movie.release_date).toLocaleDateString('vi-VN') : 'Đang cập nhật',
-      originalData: movieCard
+      originalData: movie   // ✅ Sửa ở đây
     }));
   };
+
   useEffect(() => {
     if (originalNowShowingMovies.length === 0 && originalComingSoonMovies.length === 0) {
       fetchMovies();
