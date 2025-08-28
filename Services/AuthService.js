@@ -1,10 +1,8 @@
-// services/AuthService.js
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { API_CONFIG, DEFAULT_HEADERS, API_STATUS } from '../config/api';
 
 class AuthService {
   
-  // ✅ FIXED: Enhanced API call with better error handling
   async apiCall(url, options = {}) {
     try {
       const config = {

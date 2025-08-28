@@ -473,10 +473,8 @@ const handleBuyTicket = async () => {
 
   const formatShowtime = (showtime) => {
     try {
-      // Lấy datetime gốc từ API
       const showtimeDateTime = createShowtimeDateTime(showtime.date, showtime.time);
       
-      // Cộng thêm 7 giờ
       const adjustedDateTime = new Date(showtimeDateTime.getTime() + 7 * 60 * 60 * 1000);
 
       return {

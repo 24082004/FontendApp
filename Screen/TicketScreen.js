@@ -85,18 +85,21 @@ const formatShowtime = (showtime) => {
 
 const formatSingleDateTime = (dateTimeInput) => {
   try {
-    const date = dateTimeInput instanceof Date ? dateTimeInput : new Date(dateTimeInput);
-    
+    let date = dateTimeInput instanceof Date ? new Date(dateTimeInput) : new Date(dateTimeInput);
+
     if (!isNaN(date.getTime())) {
+      // Cộng thêm 7 giờ
+      date.setHours(date.getHours() + 7);
+
       const day = String(date.getDate()).padStart(2, '0');
       const month = String(date.getMonth() + 1).padStart(2, '0');
       const year = date.getFullYear();
       const dateStr = `${day}/${month}/${year}`;
-      
+
       const hours = String(date.getHours()).padStart(2, '0');
       const minutes = String(date.getMinutes()).padStart(2, '0');
       const timeStr = `${hours}:${minutes}`;
-      
+
       return `${timeStr} - ${dateStr}`;
     }
   } catch (error) {
@@ -104,6 +107,7 @@ const formatSingleDateTime = (dateTimeInput) => {
   }
   return String(dateTimeInput);
 };
+
 
 const formatDateOnlyFromUTC = (utcDateString) => {
   try {

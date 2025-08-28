@@ -10,14 +10,14 @@ import {
   RefreshControl,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { API_CONFIG, ERROR_MESSAGES } from '../config/api';
+import { API_CONFIG, ERROR_MESSAGES } from '../config/api'; 
 import AuthService from '../Services/AuthService';
 
 export default function NotificationScreen({ navigation }) {
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-  const [filter, setFilter] = useState('all'); // all, unread, read
+  const [filter, setFilter] = useState('all');
   const [unreadCount, setUnreadCount] = useState(0);
 
   useEffect(() => {

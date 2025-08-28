@@ -16,7 +16,6 @@ import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import AuthService from '../Services/AuthService';
 
-// Enhanced safe render helper with better object handling
 const safeRender = (value, fallback = 'N/A') => {
   if (value === null || value === undefined) {
     return fallback;

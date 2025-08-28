@@ -134,15 +134,16 @@ export const API_CONFIG = {
     MY_TICKETS: `${CONFIG.API_BASE_URL}/tickets/mytickets`, // ✅ GET /api/tickets/mytickets
     
     // Guest operations
-    BY_ORDER_ID: (orderId) => `${CONFIG.API_BASE_URL}/tickets/order/${orderId}`, // ✅ GET /api/tickets/order/:orderId
-    BY_EMAIL: (email) => `${CONFIG.API_BASE_URL}/tickets/email/${email}`,        // ✅ GET /api/tickets/email/:email
+    BY_ORDER_ID: (orderId) => `${CONFIG.API_BASE_URL}/tickets/order/${orderId}`,
+    BY_EMAIL: (email) => `${CONFIG.API_BASE_URL}/tickets/email/${email}`,
     
     // Payment operations
-    UPDATE_PAYMENT: (id) => `${CONFIG.API_BASE_URL}/tickets/${id}/payment`, // ✅ PUT /api/tickets/:id/payment
+    UPDATE_PAYMENT: (id) => `${CONFIG.API_BASE_URL}/tickets/${id}/payment`,
     
     // Additional operations for future use
-    CANCEL: (id) => `${CONFIG.API_BASE_URL}/tickets/${id}/cancel`,           // Future: Cancel ticket
-    VALIDATE: `${CONFIG.API_BASE_URL}/tickets/validate`,                     // Future: Validate ticket
+    CANCEL: (id) => `${CONFIG.API_BASE_URL}/tickets/${id}/cancel`, 
+    VALIDATE: `${CONFIG.API_BASE_URL}/tickets/validate`,     
+    SCAN_HISTORY: `${CONFIG.API_BASE_URL}/tickets/scan-history`,                
   },
 
   // ✅ DEPRECATED: Keep for backward compatibility if needed

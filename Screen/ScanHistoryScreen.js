@@ -1,3 +1,4 @@
+// Screen/ScanHistoryScreen.js
 import React, { useState, useEffect } from 'react';
 import {
   View,
@@ -7,151 +8,261 @@ import {
   TouchableOpacity,
   SafeAreaView,
   Alert,
-  RefreshControl,
+  ActivityIndicator,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const ScanHistoryScreen = ({ route, navigation }) => {
+import { API_CONFIG, DEFAULT_HEADERS } from '../config/api';
+
+const ScanHistoryScreen = ({ navigation, route }) => {
   const [scanHistory, setScanHistory] = useState([]);
-  const [refreshing, setRefreshing] = useState(false);
-  const { newScan } = route.params || {};
+  const [loading, setLoading] = useState(true);
+  const [employeeInfo, setEmployeeInfo] = useState(null);
 
   useEffect(() => {
     loadScanHistory();
+    loadEmployeeInfo();
   }, []);
 
+  // ✅ Auto refresh when screen comes into focus
   useEffect(() => {
-    if (newScan) {
-      addNewScan(newScan);
+    const unsubscribe = navigation.addListener('focus', () => {
+      loadScanHistory();
+    });
+
+    return unsubscribe;
+  }, [navigation]);
+
+  // ✅ Auto refresh mỗi 30 giây
+  useEffect(() => {
+    const interval = setInterval(() => {
+      loadScanHistory();
+    }, 30000); // 30 seconds
+
+    return () => clearInterval(interval);
+  }, []);
+
+  const loadEmployeeInfo = async () => {
+    try {
+      const info = await AsyncStorage.getItem('userData');
+      if (info) {
+        setEmployeeInfo(JSON.parse(info));
+      }
+    } catch (error) {
+      console.error('Load employee info error:', error);
     }
-  }, [newScan]);
+  };
 
   const loadScanHistory = async () => {
     try {
+      setLoading(true);
+      
+      const token = await AsyncStorage.getItem('userToken');
+      const url = `${API_CONFIG.BASE_URL}/tickets/scan-history`;
+      
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+          ...DEFAULT_HEADERS,
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setScanHistory(data.data || []);
+      } else {
+        // Fallback to AsyncStorage
+        const history = await AsyncStorage.getItem('scanHistory');
+        if (history) {
+          setScanHistory(JSON.parse(history));
+        }
+      }
+    } catch (error) {
+      console.error('Load scan history error:', error);
+      // Fallback to AsyncStorage
       const history = await AsyncStorage.getItem('scanHistory');
       if (history) {
         setScanHistory(JSON.parse(history));
       }
-    } catch (error) {
-      console.error('Error loading scan history:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
-  const addNewScan = async (scanData) => {
-    try {
-      const newScanEntry = {
-        id: Date.now().toString(),
-        ...scanData,
-        scannedAt: new Date().toISOString(),
-      };
-
-      const updatedHistory = [newScanEntry, ...scanHistory];
-      setScanHistory(updatedHistory);
-      
-      await AsyncStorage.setItem('scanHistory', JSON.stringify(updatedHistory));
-    } catch (error) {
-      console.error('Error saving scan history:', error);
-    }
-  };
-
-  const onRefresh = async () => {
-    setRefreshing(true);
+  // ✅ Manual refresh function
+  const handleRefresh = async () => {
     await loadScanHistory();
-    setRefreshing(false);
   };
 
   const clearHistory = () => {
     Alert.alert(
       'Xóa lịch sử',
-      'Bạn có muốn xóa toàn bộ lịch sử quét không?',
+      'Bạn có chắc chắn muốn xóa toàn bộ lịch sử quét vé?',
       [
         { text: 'Hủy', style: 'cancel' },
         {
           text: 'Xóa',
           style: 'destructive',
           onPress: async () => {
-            try {
-              await AsyncStorage.removeItem('scanHistory');
-              setScanHistory([]);
-            } catch (error) {
-              console.error('Error clearing history:', error);
-            }
-          },
+            await AsyncStorage.removeItem('scanHistory');
+            setScanHistory([]);
+            Alert.alert('Thành công', 'Đã xóa toàn bộ lịch sử');
+},
         },
       ]
     );
   };
 
-  const formatDateTime = (dateString) => {
+  const formatDate = (dateString) => {
     const date = new Date(dateString);
     return date.toLocaleString('vi-VN', {
-      year: 'numeric',
-      month: '2-digit',
       day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
       hour: '2-digit',
       minute: '2-digit',
     });
   };
 
-  const renderScanItem = ({ item }) => (
-    <TouchableOpacity style={styles.scanItem}>
-      <View style={styles.itemHeader}>
-        <Text style={styles.movieTitle}>{item.movieTitle || 'Unknown Movie'}</Text>
-        <Text style={styles.scanTime}>{formatDateTime(item.scannedAt)}</Text>
-      </View>
-      
-      <View style={styles.itemDetails}>
-        <Text style={styles.ticketId}>ID: {item.ticketId || 'N/A'}</Text>
-        <Text style={styles.seatInfo}>
-          Ghế: {item.seatNumbers?.join(', ') || 'N/A'}
-        </Text>
-      </View>
-      
-      <View style={styles.itemFooter}>
-        <View style={styles.statusBadge}>
-          <Text style={styles.statusText}>Đã quét</Text>
+  const getStatusColor = (status) => {
+    switch (status) {
+      case 'valid':
+      case 'used':
+        return '#4CAF50';
+      case 'invalid':
+        return '#FF4444';
+      default:
+        return '#666';
+    }
+  };
+
+  const getStatusText = (status) => {
+    switch (status) {
+      case 'valid':
+        return 'Hợp lệ';
+      case 'invalid':
+        return 'Không hợp lệ';
+      case 'used':
+        return 'Đã sử dụng';
+      default:
+        return 'Không xác định';
+    }
+  };
+
+  const renderTicketItem = ({ item, index }) => (
+    <View style={styles.ticketItem}>
+      <View style={styles.ticketHeader}>
+        <View style={styles.ticketInfo}>
+          <Text style={styles.movieTitle}>{item.movieTitle || 'Phim không xác định'}</Text>
+          <Text style={styles.showTime}>
+            🕐 {item.showTime || 'N/A'} • 💺 {item.seatNumber || 'N/A'}
+          </Text>
         </View>
-        <Ionicons name="chevron-forward" size={20} color="#666" />
+        <View style={[styles.statusBadge, { backgroundColor: getStatusColor(item.status) }]}>
+          <Text style={styles.statusText}>{getStatusText(item.status)}</Text>
+        </View>
       </View>
-    </TouchableOpacity>
+      
+      <View style={styles.ticketDetails}>
+        <Text style={styles.customerName}>👤 {item.customerName || 'Khách hàng'}</Text>
+        <Text style={styles.scanTime}>📅 {formatDate(item.scanTime)}</Text>
+        <Text style={styles.qrData}>🎫 {item.qrData?.substring(0, 20)}...</Text>
+      </View>
+    </View>
   );
 
   const renderEmptyState = () => (
     <View style={styles.emptyState}>
-      <Ionicons name="scan" size={64} color="#666" />
-      <Text style={styles.emptyTitle}>Chưa có lịch sử quét</Text>
-      <Text style={styles.emptySubtitle}>
-        Các mã QR vé đã quét sẽ hiển thị tại đây
+      <Ionicons name="document-text-outline" size={80} color="#666" />
+      <Text style={styles.emptyText}>Chưa có lịch sử quét vé</Text>
+      <Text style={styles.emptySubText}>
+        Các vé đã quét sẽ được hiển thị ở đây
       </Text>
+      <TouchableOpacity style={styles.refreshButton} onPress={handleRefresh}>
+        <Ionicons name="refresh-outline" size={16} color="#000" />
+        <Text style={styles.refreshButtonText}>Làm mới</Text>
+      </TouchableOpacity>
     </View>
   );
 
+  if (loading && scanHistory.length === 0) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#FCC434" />
+        <Text style={styles.loadingText}>Đang tải lịch sử...</Text>
+      </View>
+    );
+  }
+
   return (
     <SafeAreaView style={styles.container}>
+      {/* Header */}
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>Lịch sử quét</Text>
-        {scanHistory.length > 0 && (
-          <TouchableOpacity onPress={clearHistory} style={styles.clearButton}>
-            <Ionicons name="trash-outline" size={20} color="#f44336" />
+        <View>
+          <Text style={styles.headerTitle}>Lịch sử quét vé</Text>
+          <Text style={styles.headerSubtitle}>
+            {employeeInfo?.name || 'Nhân viên'} • {scanHistory.length} vé đã quét
+          </Text>
+        </View>
+        
+        <View style={styles.headerActions}>
+{/* ✅ Manual refresh button */}
+          <TouchableOpacity style={styles.refreshHeaderButton} onPress={handleRefresh}>
+            <Ionicons name="refresh-outline" size={20} color="#FCC434" />
           </TouchableOpacity>
-        )}
+          
+          {scanHistory.length > 0 && (
+            <TouchableOpacity style={styles.clearButton} onPress={clearHistory}>
+              <Ionicons name="trash-outline" size={20} color="#FF4444" />
+            </TouchableOpacity>
+          )}
+        </View>
       </View>
 
+      {/* Loading indicator khi refresh */}
+      {loading && scanHistory.length > 0 && (
+        <View style={styles.refreshIndicator}>
+          <ActivityIndicator size="small" color="#FCC434" />
+          <Text style={styles.refreshText}>Đang cập nhật...</Text>
+        </View>
+      )}
+
+      {/* Summary Cards */}
+      <View style={styles.summaryContainer}>
+        <View style={styles.summaryCard}>
+          <Text style={styles.summaryNumber}>{scanHistory.length}</Text>
+          <Text style={styles.summaryLabel}>Tổng vé quét</Text>
+        </View>
+        
+        <View style={styles.summaryCard}>
+          <Text style={styles.summaryNumber}>
+            {scanHistory.filter(item => item.status === 'valid' || item.status === 'used').length}
+          </Text>
+          <Text style={styles.summaryLabel}>Vé hợp lệ</Text>
+        </View>
+        
+        <View style={styles.summaryCard}>
+          <Text style={styles.summaryNumber}>
+            {scanHistory.filter(item => 
+              new Date(item.scanTime).toDateString() === new Date().toDateString()
+            ).length}
+          </Text>
+          <Text style={styles.summaryLabel}>Hôm nay</Text>
+        </View>
+      </View>
+
+      {/* History List */}
       <FlatList
-        data={scanHistory}
-        keyExtractor={(item) => item.id}
-        renderItem={renderScanItem}
-        contentContainerStyle={styles.listContainer}
-        showsVerticalScrollIndicator={false}
-        refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={onRefresh}
-            tintColor="#FFD700"
-          />
-        }
+        data={scanHistory.sort((a, b) => new Date(b.scanTime) - new Date(a.scanTime))}
+        renderItem={renderTicketItem}
+        keyExtractor={(item, index) => `${item._id || item.orderId || index}`}
         ListEmptyComponent={renderEmptyState}
+        contentContainerStyle={scanHistory.length === 0 ? styles.emptyContainer : styles.listContainer}
+        showsVerticalScrollIndicator={false}
+        refreshing={loading}
+        onRefresh={handleRefresh}
       />
     </SafeAreaView>
   );
@@ -160,98 +271,189 @@ const ScanHistoryScreen = ({ route, navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#1a1a1a',
+    backgroundColor: '#000',
+  },
+  loadingContainer: {
+    flex: 1,
+    backgroundColor: '#000',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadingText: {
+    color: '#fff',
+    fontSize: 16,
+    marginTop: 15,
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 20,
-    paddingVertical: 15,
-    borderBottomWidth: 1,
-    borderBottomColor: '#333',
+    paddingTop: 10,
+    paddingBottom: 20,
   },
   headerTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
     color: '#fff',
+    fontSize: 24,
+    fontWeight: 'bold',
+  },
+  headerSubtitle: {
+    color: '#FCC434',
+    fontSize: 14,
+    marginTop: 5,
+  },
+  headerActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+refreshHeaderButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(253, 197, 54, 0.2)',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   clearButton: {
-    padding: 8,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(255,68,68,0.2)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  refreshIndicator: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 10,
+    backgroundColor: 'rgba(253, 197, 54, 0.1)',
+  },
+  refreshText: {
+    color: '#FCC434',
+    fontSize: 12,
+    marginLeft: 8,
+  },
+  summaryContainer: {
+    flexDirection: 'row',
+    paddingHorizontal: 20,
+    marginBottom: 20,
+    gap: 10,
+  },
+  summaryCard: {
+    flex: 1,
+    backgroundColor: '#1a1a1a',
+    padding: 15,
+    borderRadius: 10,
+    alignItems: 'center',
+  },
+  summaryNumber: {
+    color: '#FCC434',
+    fontSize: 24,
+    fontWeight: 'bold',
+  },
+  summaryLabel: {
+    color: '#ccc',
+    fontSize: 12,
+    marginTop: 5,
   },
   listContainer: {
-    padding: 16,
-    flexGrow: 1,
+    paddingHorizontal: 20,
+    paddingBottom: 20,
   },
-  scanItem: {
-    backgroundColor: '#2d2d2d',
+  emptyContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  emptyState: {
+    alignItems: 'center',
+    paddingVertical: 60,
+  },
+  emptyText: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginTop: 20,
+  },
+  emptySubText: {
+    color: '#666',
+    fontSize: 14,
+    marginTop: 10,
+    textAlign: 'center',
+    marginBottom: 20,
+  },
+  refreshButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FCC434',
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 25,
+    gap: 8,
+  },
+  refreshButtonText: {
+    color: '#000',
+    fontSize: 14,
+    fontWeight: 'bold',
+  },
+  ticketItem: {
+    backgroundColor: '#1a1a1a',
     borderRadius: 12,
-    padding: 16,
-    marginBottom: 12,
+    padding: 15,
+    marginBottom: 10,
+    borderLeftWidth: 4,
+    borderLeftColor: '#FCC434',
   },
-  itemHeader: {
+  ticketHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
-    marginBottom: 8,
+    marginBottom: 10,
+  },
+  ticketInfo: {
+    flex: 1,
   },
   movieTitle: {
+    color: '#fff',
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#fff',
-    flex: 1,
-    marginRight: 8,
   },
-  scanTime: {
-    fontSize: 12,
-    color: '#888',
-  },
-  itemDetails: {
-    marginBottom: 12,
-  },
-  ticketId: {
-    fontSize: 14,
-    color: '#FFD700',
-    marginBottom: 4,
-  },
-  seatInfo: {
-    fontSize: 14,
+  showTime: {
     color: '#ccc',
-  },
-  itemFooter: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    fontSize: 14,
+    marginTop: 5,
   },
   statusBadge: {
-    backgroundColor: '#4CAF50',
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 12,
   },
   statusText: {
+    color: '#fff',
     fontSize: 12,
-    color: '#fff',
-    fontWeight: '500',
-  },
-  emptyState: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingVertical: 60,
-  },
-  emptyTitle: {
-    fontSize: 18,
     fontWeight: 'bold',
-    color: '#fff',
-    marginTop: 16,
-    marginBottom: 8,
   },
-  emptySubtitle: {
+  ticketDetails: {
+    borderTopWidth: 1,
+    borderTopColor: '#333',
+    paddingTop: 10,
+  },
+  customerName: {
+    color: '#FCC434',
     fontSize: 14,
-    color: '#888',
-    textAlign: 'center',
-    paddingHorizontal: 40,
+    marginBottom: 5,
+  },
+  scanTime: {
+    color: '#999',
+    fontSize: 12,
+    marginBottom: 5,
+  },
+  qrData: {
+    color: '#666',
+    fontSize: 11,
+    fontFamily: 'monospace',
   },
 });
 

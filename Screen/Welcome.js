@@ -10,7 +10,6 @@ import {
   Dimensions,
   ImageBackground,
 } from 'react-native';
-import Icon from 'react-native-vector-icons/MaterialIcons';
 
 const { width, height } = Dimensions.get('window');
 
