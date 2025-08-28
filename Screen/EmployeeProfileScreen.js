@@ -234,9 +234,9 @@ const history = await AsyncStorage.getItem('scanHistory');
         'Cinema Staff App\n' +
         'Ứng dụng quản lý vé xem phim cho nhân viên\n\n' +
         'Phiên bản: 1.0.0\n' +
-        'Build: 2024.08.27\n\n' +
-        'Phát triển bởi Cinema Team\n' +
-        '© 2024 All rights reserved.'
+        'Build: 2025.05.19\n\n' +
+        'Phát triển bởi Cinema Team MD-25\n' +
+        '© 2025 All rights reserved.'
       ),
     },
   ];
@@ -412,7 +412,7 @@ const history = await AsyncStorage.getItem('scanHistory');
         {/* App Info */}
         <View style={styles.appInfo}>
           <Text style={styles.versionText}>Cinema Staff App v1.0.0</Text>
-          <Text style={styles.buildText}>Build 2024.08.27</Text>
+          <Text style={styles.buildText}>Build 2025.05.19</Text>
         </View>
       </ScrollView>
     </SafeAreaView>

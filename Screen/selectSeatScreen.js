@@ -14,10 +14,8 @@ import { Ionicons } from '@expo/vector-icons';
 import { API_CONFIG, buildApiUrl, DEFAULT_HEADERS } from '../config/api';
 
 export default function SelectSeatScreen({ route, navigation }) {
-  // Test data để debug
   const TEST_MOVIE_ID = '675b4e82bdc5d7c4a5a2b123';
   
-  // States for data
   const [showtimes, setShowtimes] = useState([]);
   const [seats, setSeats] = useState([]);
   const [seatStatus, setSeatStatus] = useState({});
@@ -25,12 +23,10 @@ export default function SelectSeatScreen({ route, navigation }) {
   const [selectedShowtime, setSelectedShowtime] = useState(null);
   const [selectedDate, setSelectedDate] = useState(null);
   
-  // States for UI
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState(null);
 
-  // Movie data from navigation params
   const movieData = route?.params || {};
   
   const {
@@ -53,7 +49,6 @@ export default function SelectSeatScreen({ route, navigation }) {
   
   const movieId = rawMovieId || id || _id || movie_id || fullMovieData?._id || fullMovieData?.id || TEST_MOVIE_ID;
 
-  // Fixed helper functions for date/time handling
   const getCurrentDateTime = () => {
     const now = new Date();
     const vietnamOffset = 7 * 60 * 60 * 1000;
@@ -70,23 +65,33 @@ export default function SelectSeatScreen({ route, navigation }) {
 
   const createShowtimeDateTime = (dateStr, timeStr) => {
     try {
-      const showtimeDate = new Date(dateStr);
-      const showtimeTime = new Date(timeStr);
+      if (timeStr && timeStr.includes('T')) {
+        return new Date(timeStr);
+      }
       
-      const result = new Date(showtimeDate.getFullYear(), 
-                             showtimeDate.getMonth(), 
-                             showtimeDate.getDate(),
-                             showtimeTime.getUTCHours(),
-                             showtimeTime.getUTCMinutes(), 
-                             showtimeTime.getUTCSeconds());
+      if (dateStr && timeStr) {
+        const date = new Date(dateStr);
+        const time = new Date(timeStr);
+        
+        const combined = new Date(
+          date.getFullYear(),
+          date.getMonth(),
+          date.getDate(),
+          time.getHours(),
+          time.getMinutes(),
+          time.getSeconds()
+        );
+        
+        return combined;
+      }
       
-      return result;
+      return new Date(timeStr);
+      
     } catch (error) {
       return new Date(timeStr);
     }
   };
 
-  // Fixed filtering logic
   const filterShowtimes = (rawShowtimes) => {
     const now = getCurrentDateTime();
     const today = getTodayStart();
@@ -96,8 +101,7 @@ export default function SelectSeatScreen({ route, navigation }) {
       const showtimeDateOnly = new Date(showtimeDate.getFullYear(), 
                                        showtimeDate.getMonth(), 
                                        showtimeDate.getDate());
-      
-      if (showtimeDateOnly.getTime() < today.getTime()) {
+if (showtimeDateOnly.getTime() < today.getTime()) {
         return false;
       }
       
@@ -115,7 +119,6 @@ export default function SelectSeatScreen({ route, navigation }) {
     });
   };
 
-  // API call helper function
   const apiCall = async (url, options = {}) => {
     try {
       const config = {
@@ -145,7 +148,6 @@ export default function SelectSeatScreen({ route, navigation }) {
     }
   };
 
-  // Load initial data
   useEffect(() => {
     if (movieId) {
       loadInitialData();
@@ -155,7 +157,6 @@ export default function SelectSeatScreen({ route, navigation }) {
     }
   }, [movieId]);
 
-  // Load seat status when showtime changes
   useEffect(() => {
     if (selectedShowtime) {
       loadSeatStatus(selectedShowtime._id);
@@ -167,115 +168,75 @@ export default function SelectSeatScreen({ route, navigation }) {
       setLoading(true);
       setError(null);
 
-      const testMovieId = movieId || '675b4e82bdc5d7c4a5a2b123';
-
+      const testMovieId = movieId || "675b4e82bdc5d7c4a5a2b123";
       const showtimesUrl = API_CONFIG.SHOWTIME.BY_MOVIE(testMovieId);
-      
+
       const showtimesResult = await apiCall(showtimesUrl);
 
       if (showtimesResult.success) {
         if (Array.isArray(showtimesResult.data)) {
           let rawShowtimes = showtimesResult.data;
-          
+
           if (selectedCinema && selectedCinema._id) {
-            rawShowtimes = rawShowtimes.filter(showtime => {
+            rawShowtimes = rawShowtimes.filter((showtime) => {
               const cinemaId = showtime.cinema._id || showtime.cinema;
               return cinemaId === selectedCinema._id;
             });
           }
-          
+
           rawShowtimes = filterShowtimes(rawShowtimes);
-          
+
           const groupedByCinema = rawShowtimes.reduce((acc, showtime) => {
             const cinemaId = showtime.cinema._id || showtime.cinema;
-            
+
             if (!acc[cinemaId]) {
               acc[cinemaId] = {
                 cinema: showtime.cinema,
-                showtimes: []
+                showtimes: [],
               };
             }
-            
+
             acc[cinemaId].showtimes.push(showtime);
             return acc;
           }, {});
-          
-          Object.values(groupedByCinema).forEach(cinemaData => {
+
+          Object.values(groupedByCinema).forEach((cinemaData) => {
             cinemaData.showtimes.sort((a, b) => {
-              const dateTimeA = createShowtimeDateTime(a.date, a.time);
-              const dateTimeB = createShowtimeDateTime(b.date, b.time);
+const dateTimeA = createShowtimeDateTime(a.date, a.time || a.startTime);
+              const dateTimeB = createShowtimeDateTime(b.date, b.time || b.startTime);
               return dateTimeA.getTime() - dateTimeB.getTime();
             });
           });
-          
+
           const processedData = Object.values(groupedByCinema);
           setShowtimes(processedData);
-          
+
           if (processedData.length > 0 && processedData[0].showtimes?.length > 0) {
             const firstCinema = processedData[0];
             const firstShowtime = firstCinema.showtimes[0];
-            
+
             setSelectedShowtime({
               ...firstShowtime,
-              cinema: firstCinema.cinema
+              cinema: firstCinema.cinema,
             });
-            
+
             const firstDate = new Date(firstShowtime.date).toLocaleDateString('vi-VN');
             setSelectedDate(firstDate);
-            
+
             if (firstShowtime.room && (firstShowtime.room._id || firstShowtime.room)) {
               const roomId = firstShowtime.room._id || firstShowtime.room;
               await loadSeats(roomId);
             }
           }
+          
         } else {
-          let processedData = showtimesResult.data;
-          
-          if (selectedCinema && selectedCinema._id) {
-            processedData = processedData.filter(cinemaData => 
-              cinemaData.cinema._id === selectedCinema._id
-            );
-          }
-          
-          processedData = processedData.map(cinemaData => ({
-            ...cinemaData,
-            showtimes: filterShowtimes(cinemaData.showtimes)
-          })).filter(cinemaData => cinemaData.showtimes.length > 0);
-          
-          processedData.forEach(cinemaData => {
-            cinemaData.showtimes.sort((a, b) => {
-              const dateTimeA = createShowtimeDateTime(a.date, a.time);
-              const dateTimeB = createShowtimeDateTime(b.date, b.time);
-              return dateTimeA.getTime() - dateTimeB.getTime();
-            });
-          });
-          
-          setShowtimes(processedData);
-          
-          if (processedData.length > 0 && processedData[0].showtimes?.length > 0) {
-            const firstCinema = processedData[0];
-            const firstShowtime = firstCinema.showtimes[0];
-            
-            setSelectedShowtime({
-              ...firstShowtime,
-              cinema: firstCinema.cinema
-            });
-            
-            const firstDate = new Date(firstShowtime.date).toLocaleDateString('vi-VN');
-            setSelectedDate(firstDate);
-            
-            if (firstShowtime.room && (firstShowtime.room._id || firstShowtime.room)) {
-              const roomId = firstShowtime.room._id || firstShowtime.room;
-              await loadSeats(roomId);
-            }
-          }
+          // Handle object format response if needed
         }
       } else {
-        setError(showtimesResult.error || 'Không thể tải suất chiếu');
+        setError(showtimesResult.error || "Không thể tải suất chiếu");
       }
-
     } catch (err) {
-      setError(err.error || err.message || 'Có lỗi xảy ra khi tải dữ liệu');
+      setError(err.error || err.message || "Có lỗi xảy ra khi tải dữ liệu");
     } finally {
       setLoading(false);
     }
@@ -298,23 +259,16 @@ export default function SelectSeatScreen({ route, navigation }) {
 
   const loadSeatStatus = async (showtimeId) => {
     try {
-      const statusUrl = API_CONFIG.SEAT_STATUS?.BY_SHOWTIME?.(showtimeId);
-      
-      if (!statusUrl) {
-        setSeatStatus({});
-        return;
-      }
-      
+      const statusUrl = `${API_CONFIG.BASE_URL}/seats/status/${showtimeId}`;
       const statusResult = await apiCall(statusUrl);
       
-      if (statusResult.success) {
+      if (statusResult.success && statusResult.data) {
         const statusMap = {};
-        
-        const seatStatuses = statusResult.data?.seats || statusResult.data || [];
+        const seatStatuses = statusResult.data.seats || [];
         
         if (Array.isArray(seatStatuses)) {
           seatStatuses.forEach(seatData => {
-            const seatId = seatData.seatId || seatData.seat?._id || seatData.seat;
+            const seatId = seatData.id || seatData._id || seatData.seatId || seatData.seat?._id || seatData.seat;
             const status = seatData.status || 'available';
             
             if (seatId) {
@@ -334,16 +288,21 @@ export default function SelectSeatScreen({ route, navigation }) {
 
   const onRefresh = async () => {
     setRefreshing(true);
+    
     setSelectedSeats([]);
     setSeatStatus({});
+    setSeats([]);
+    setSelectedShowtime(null);
     setSelectedDate(null);
+    
     await loadInitialData();
-    setRefreshing(false);
+setRefreshing(false);
   };
 
   const handleDateSelect = (date) => {
     setSelectedDate(date);
     setSelectedSeats([]);
+    setSeatStatus({});
     
     const showtimesForDate = getGroupedShowtimes()[date];
     if (showtimesForDate && showtimesForDate.length > 0) {
@@ -362,12 +321,26 @@ export default function SelectSeatScreen({ route, navigation }) {
         cinema: cinema || showtime.cinema
       };
       
-      setSelectedShowtime(newShowtime);
       setSelectedSeats([]);
       
-      if (!selectedShowtime || selectedShowtime.room._id !== showtime.room._id) {
-        await loadSeats(showtime.room._id);
+      const currentRoomId = selectedShowtime?.room?._id || selectedShowtime?.room;
+      const newRoomId = showtime.room?._id || showtime.room;
+      
+      if (currentRoomId !== newRoomId) {
+        setSeatStatus({});
+        setSeats([]);
       }
+      
+      setSelectedShowtime(newShowtime);
+      
+      if (newRoomId) {
+        await loadSeats(newRoomId);
+        
+        setTimeout(() => {
+          loadSeatStatus(showtime._id);
+        }, 100);
+      }
+      
     } catch (err) {
       Alert.alert('Lỗi', 'Không thể chuyển suất chiếu');
     }
@@ -401,102 +374,113 @@ export default function SelectSeatScreen({ route, navigation }) {
     }
   };
 
-const handleBuyTicket = async () => {
-  if (!selectedShowtime) {
-    Alert.alert('Chưa chọn suất chiếu', 'Vui lòng chọn suất chiếu để tiếp tục!');
-    return;
-  }
-
-  if (selectedSeats.length === 0) {
-    Alert.alert('Chưa chọn ghế', 'Vui lòng chọn ít nhất một ghế để tiếp tục!');
-    return;
-  }
-
-  try {
-    setLoading(true);
-
-    // Tùy chọn: Kiểm tra validation API có tồn tại không
-    const validateUrl = API_CONFIG.SEAT?.VALIDATE_AVAILABILITY;
-    
-    if (validateUrl) {
-      try {
-        const seatIds = selectedSeats.map(seat => seat._id);
-        
-        const validation = await apiCall(validateUrl, {
-          method: 'POST',
-          body: JSON.stringify({
-            seatIds,
-            showtimeId: selectedShowtime._id
-          })
-        });
-
-        if (!validation.success) {
-          Alert.alert('Ghế không khả dụng', validation.error || 'Một số ghế đã được đặt');
-          await loadSeatStatus(selectedShowtime._id);
-          setSelectedSeats([]);
-          return;
-        }
-      } catch (validationError) {
-        // Nếu API validation lỗi, chỉ log và tiếp tục (không block user)
-        console.warn('Seat validation failed, continuing anyway:', validationError.message);
-      }
+  const handleBuyTicket = async () => {
+    if (!selectedShowtime) {
+      Alert.alert('Chưa chọn suất chiếu', 'Vui lòng chọn suất chiếu để tiếp tục!');
+      return;
     }
 
-    // Chuẩn bị dữ liệu để chuyển sang SelectFoodScreen
-    const paymentData = {
-      movieId,
-      movieTitle,
-      duration,
-      releaseDate,
-      genre,
-      rating,
-      votes,
-      image,
-      
-      showtime: selectedShowtime,
-      selectedSeats: selectedSeats,
-      totalPrice: calculateTotalPrice(),
-      
-      cinema: selectedShowtime.cinema,
-      room: selectedShowtime.room
-    };
+    if (selectedSeats.length === 0) {
+      Alert.alert('Chưa chọn ghế', 'Vui lòng chọn ít nhất một ghế để tiếp tục!');
+      return;
+    }
 
-    navigation.navigate('SelectFood', paymentData);
-
-  } catch (err) {
-    console.error('Error in handleBuyTicket:', err);
-    Alert.alert('Lỗi', 'Có lỗi xảy ra. Vui lòng thử lại.');
-  } finally {
-    setLoading(false);
-  }
-};
-
-  const formatShowtime = (showtime) => {
     try {
-      const showtimeDateTime = createShowtimeDateTime(showtime.date, showtime.time);
-      
-      const adjustedDateTime = new Date(showtimeDateTime.getTime() + 7 * 60 * 60 * 1000);
+      setLoading(true);
 
-      return {
-        date: adjustedDateTime.toLocaleDateString('vi-VN'),
-        time: adjustedDateTime.toLocaleTimeString('vi-VN', { 
-          hour: '2-digit', 
-          minute: '2-digit',
-          hour12: false
-        })
+      const validateUrl = API_CONFIG.SEAT?.VALIDATE_AVAILABILITY;
+      
+      if (validateUrl) {
+        try {
+          const seatIds = selectedSeats.map(seat => seat._id);
+          
+          const validation = await apiCall(validateUrl, {
+            method: 'POST',
+            body: JSON.stringify({
+              seatIds,
+              showtimeId: selectedShowtime._id
+            })
+          });
+
+          if (!validation.success) {
+            Alert.alert('Ghế không khả dụng', validation.error || 'Một số ghế đã được đặt');
+            await loadSeatStatus(selectedShowtime._id);
+            setSelectedSeats([]);
+return;
+          }
+        } catch (validationError) {
+          // Continue if validation fails
+        }
+      }
+
+      const paymentData = {
+        movieId,
+        movieTitle,
+        duration,
+        releaseDate,
+        genre,
+        rating,
+        votes,
+        image,
+        
+        showtime: selectedShowtime,
+        selectedSeats: selectedSeats,
+        totalPrice: calculateTotalPrice(),
+        
+        cinema: selectedShowtime.cinema,
+        room: selectedShowtime.room
       };
-    } catch (error) {
-      return {
-        date: new Date(showtime.date).toLocaleDateString('vi-VN'),
-        time: new Date(showtime.time).toLocaleTimeString('vi-VN', { 
-          hour: '2-digit', 
-          minute: '2-digit',
-          hour12: false
-        })
-      };
+
+      navigation.navigate('SelectFood', paymentData);
+
+    } catch (err) {
+      Alert.alert('Lỗi', 'Có lỗi xảy ra. Vui lòng thử lại.');
+    } finally {
+      setLoading(false);
     }
   };
 
+  const formatShowtime = (showtime) => {
+    try {
+      let timeValue = showtime.time || showtime.startTime;
+      let dateValue = showtime.date || showtime.showDate;
+      
+      let formattedTime = 'N/A';
+      if (timeValue) {
+        const timeDate = new Date(timeValue);
+        if (!isNaN(timeDate.getTime())) {
+          formattedTime = timeDate.toLocaleTimeString('vi-VN', {
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: false
+          });
+        }
+      }
+      
+      let formattedDate = 'N/A';
+      if (dateValue) {
+        const dateDate = new Date(dateValue);
+        if (!isNaN(dateDate.getTime())) {
+          formattedDate = dateDate.toLocaleDateString('vi-VN');
+        }
+      }
+      
+      return {
+        date: formattedDate,
+        time: formattedTime
+      };
+      
+    } catch (error) {
+      return {
+        date: showtime.date ? new Date(showtime.date).toLocaleDateString('vi-VN') : 'N/A',
+        time: showtime.time ? new Date(showtime.time).toLocaleTimeString('vi-VN', {
+          hour: '2-digit',
+          minute: '2-digit',
+          hour12: false
+        }) : 'N/A'
+      };
+    }
+  };
 
   const getGroupedShowtimes = () => {
     const grouped = {};
@@ -535,7 +519,7 @@ const handleBuyTicket = async () => {
     showtimes.forEach(cinemaData => {
       const isSelectedCinema = !selectedCinema || 
         cinemaData.cinema._id === selectedCinema._id ||
-        cinemaData.cinema.name === selectedCinema.name;
+cinemaData.cinema.name === selectedCinema.name;
       
       if (isSelectedCinema && cinemaData.showtimes) {
         cinemaData.showtimes.forEach(showtime => {
@@ -575,7 +559,6 @@ const handleBuyTicket = async () => {
     return selectedSeats.reduce((total, seat) => total + (seat.price || 0), 0);
   };
 
-  // Loading state
   if (loading && !refreshing && showtimes.length === 0) {
     return (
       <SafeAreaView style={[styles.container, styles.centerContent]}>
@@ -585,7 +568,6 @@ const handleBuyTicket = async () => {
     );
   }
 
-  // Error state
   if (error && showtimes.length === 0) {
     return (
       <SafeAreaView style={[styles.container, styles.centerContent]}>
@@ -600,7 +582,6 @@ const handleBuyTicket = async () => {
     );
   }
 
-  // No showtimes state
   if (!loading && showtimes.length === 0) {
     return (
       <SafeAreaView style={[styles.container, styles.centerContent]}>
@@ -621,13 +602,12 @@ const handleBuyTicket = async () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity 
           style={styles.backButton}
           onPress={() => navigation.goBack()}
         >
-          <Ionicons name="arrow-back" size={24} color="#fff" />
+<Ionicons name="arrow-back" size={24} color="#fff" />
         </TouchableOpacity>
         
         <View style={styles.headerContent}>
@@ -660,7 +640,6 @@ const handleBuyTicket = async () => {
           />
         }
       >
-        {/* Current Selection Info */}
         {selectedShowtime && (
           <View style={styles.infoContainer}>
             <View style={styles.infoRow}>
@@ -692,7 +671,6 @@ const handleBuyTicket = async () => {
           </View>
         )}
 
-        {/* Cinema Info */}
         {selectedCinema && (
           <View style={styles.cinemaCard}>
             <View style={styles.cinemaHeader}>
@@ -706,12 +684,11 @@ const handleBuyTicket = async () => {
           </View>
         )}
 
-        {/* Date Selection */}
         <View style={styles.sectionContainer}>
           <Text style={styles.sectionTitle}>
             <Ionicons name="calendar-outline" size={16} color="#FDC536" /> Chọn ngày chiếu
           </Text>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.scrollHorizontal}>
+<ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.scrollHorizontal}>
             {availableDates.map(date => {
               const isSelected = selectedDate === date;
               const isToday = date === new Date().toLocaleDateString('vi-VN');
@@ -747,7 +724,6 @@ const handleBuyTicket = async () => {
           </ScrollView>
         </View>
 
-        {/* Showtime Selection */}
         <View style={styles.sectionContainer}>
           <Text style={styles.sectionTitle}>
             <Ionicons name="time-outline" size={16} color="#FDC536" /> 
@@ -781,7 +757,7 @@ const handleBuyTicket = async () => {
             {getShowtimesForSelectedDate().length === 0 && selectedDate && (
               <View style={styles.emptyShowtimes}>
                 <Ionicons name="calendar-clear-outline" size={32} color="#666" />
-                <Text style={styles.emptyShowtimesText}>
+<Text style={styles.emptyShowtimesText}>
                   Không có suất chiếu vào ngày {selectedDate}
                 </Text>
               </View>
@@ -789,7 +765,6 @@ const handleBuyTicket = async () => {
           </ScrollView>
         </View>
 
-        {/* Seat Map */}
         {Object.keys(seatsByRow).length > 0 ? (
           <View style={styles.seatMapContainer}>
             <Text style={styles.sectionTitle}>
@@ -838,7 +813,6 @@ const handleBuyTicket = async () => {
               ))}
             </View>
 
-            {/* Legend */}
             <View style={styles.legendContainer}>
               <Legend icon="square" color="#2E2E2E" label="Trống" />
               <Legend icon="square" color="#594416" label="Đã đặt" />
@@ -854,10 +828,9 @@ const handleBuyTicket = async () => {
           </View>
         )}
 
-        {/* Selected Seats Summary */}
         {selectedSeats.length > 0 && (
           <View style={styles.selectedSeatsContainer}>
-            <View style={styles.selectedSeatsHeader}>
+<View style={styles.selectedSeatsHeader}>
               <Ionicons name="checkmark-circle" size={20} color="#4CAF50" />
               <Text style={styles.selectedSeatsTitle}>
                 Ghế đã chọn ({selectedSeats.length}):
@@ -876,11 +849,9 @@ const handleBuyTicket = async () => {
           </View>
         )}
 
-        {/* Bottom spacing */}
         <View style={styles.bottomSpacing} />
       </ScrollView>
 
-      {/* Footer */}
       <View style={styles.footer}>
         <View style={styles.totalContainer}>
           <Text style={styles.totalLabel}>Tổng cộng</Text>
@@ -945,7 +916,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 20,
-    paddingTop: 50, // Tăng padding top để tránh status bar
+    paddingTop: 50,
     paddingBottom: 15,
     backgroundColor: '#111',
     borderBottomWidth: 1,
@@ -964,7 +935,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 20,
     fontWeight: '700',
-    color: '#fff',
+color: '#fff',
     marginBottom: 4,
   },
   movieTitle: {
@@ -1127,7 +1098,7 @@ const styles = StyleSheet.create({
     minWidth: 200,
   },
   emptyShowtimesText: {
-    color: '#ccc',
+color: '#ccc',
     fontSize: 14,
     textAlign: 'center',
     marginTop: 8,
@@ -1283,7 +1254,7 @@ const styles = StyleSheet.create({
   selectedSeatPrice: {
     color: '#333',
     fontSize: 10,
-    marginTop: 2,
+marginTop: 2,
   },
   bottomSpacing: {
     height: 100,
