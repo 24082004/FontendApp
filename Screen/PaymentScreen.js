@@ -205,42 +205,88 @@ const PaymentScreen = ({ route, navigation }) => {
 
   // Format showtime
   const formatShowtime = () => {
-    if (!showtime) return '';
-    try {
-      const date = new Date(showtime.date).toLocaleDateString('vi-VN');
-      
-      // Xử lý time string trực tiếp thay vì tạo Date object
-      let timeString = '';
-      if (typeof showtime.time === 'string') {
-        // Nếu time đã là string dạng "HH:MM", sử dụng trực tiếp
-        timeString = showtime.time;
-      } else if (showtime.time instanceof Date) {
-        // Nếu time là Date object
-        timeString = showtime.time.toLocaleTimeString('vi-VN', { 
-          hour: '2-digit', 
-          minute: '2-digit',
-          hour12: false
-        });
-      } else {
-        // Fallback: thử parse thành Date
-        const timeDate = new Date(showtime.time);
-        if (!isNaN(timeDate.getTime())) {
-          timeString = timeDate.toLocaleTimeString('vi-VN', { 
-            hour: '2-digit', 
-            minute: '2-digit',
-            hour12: false
+    if (!showtime) return 'N/A';
+    
+    // Sử dụng logic giống hệt TicketScreen
+    if (typeof showtime === 'object') {
+      // Logic ưu tiên: time + date
+      if (showtime.time && showtime.date) {
+        try {
+          const timeDate = new Date(showtime.time);
+          const dateOnly = new Date(showtime.date);
+          
+          // Kết hợp date và time
+          const combinedDateTime = new Date(
+            dateOnly.getFullYear(),
+            dateOnly.getMonth(),
+            dateOnly.getDate(),
+            timeDate.getHours(),
+            timeDate.getMinutes(),
+            timeDate.getSeconds()
+          );
+          
+          const timeStr = combinedDateTime.toLocaleTimeString("vi-VN", {
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: false,
           });
-        } else {
-          timeString = String(showtime.time);
+          const dateStr = combinedDateTime.toLocaleDateString("vi-VN");
+          
+          return `${timeStr} - ${dateStr}`;
+        } catch (error) {
+          console.log('PaymentScreen - Error:', error);
         }
       }
       
-      return `${date} - ${timeString}`;
-    } catch (error) {
-      console.warn('Error formatting showtime:', error);
-      return '';
+      // Fallback cho startTime
+      if (showtime.startTime) {
+        try {
+          const date = new Date(showtime.startTime);
+          const dateStr = date.toLocaleDateString("vi-VN");
+          const timeStr = date.toLocaleTimeString("vi-VN", {
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: false,
+          });
+          return `${timeStr} - ${dateStr}`;
+        } catch (error) {
+          return String(showtime.startTime);
+        }
+      }
+      
+      // Các fallback khác
+      if (showtime.datetime) return formatSingleDateTime(showtime.datetime);
+      if (showtime.time) return formatSingleDateTime(showtime.time);
+      
+      // Fallback cuối nếu có _id
+      if (showtime._id) {
+        return 'N/A';
+      }
     }
+    
+    // Nếu showtime là string hoặc Date
+    return formatSingleDateTime(showtime);
   };
+
+const formatSingleDateTime = (dateTimeInput) => {
+  try {
+    const date = dateTimeInput instanceof Date ? dateTimeInput : new Date(dateTimeInput);
+    
+    if (!isNaN(date.getTime())) {
+      const dateStr = date.toLocaleDateString("vi-VN");
+      const timeStr = date.toLocaleTimeString("vi-VN", {
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: false,
+      });
+      return `${timeStr} - ${dateStr}`;
+    }
+  } catch (error) {
+    return String(dateTimeInput);
+  }
+  return String(dateTimeInput);
+};
+
 
   // Load available discounts
   const loadAvailableDiscounts = async () => {

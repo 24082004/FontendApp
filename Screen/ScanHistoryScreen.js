@@ -13,6 +13,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+// Import API config
 import { API_CONFIG, DEFAULT_HEADERS } from '../config/api';
 
 const ScanHistoryScreen = ({ navigation, route }) => {
@@ -21,33 +22,44 @@ const ScanHistoryScreen = ({ navigation, route }) => {
   const [employeeInfo, setEmployeeInfo] = useState(null);
 
   useEffect(() => {
-    loadScanHistory();
     loadEmployeeInfo();
   }, []);
+
+  useEffect(() => {
+    if (employeeInfo) {
+      loadScanHistory();
+    }
+  }, [employeeInfo]);
 
   // ✅ Auto refresh when screen comes into focus
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
-      loadScanHistory();
+      if (employeeInfo) {
+        loadScanHistory();
+      }
     });
 
     return unsubscribe;
-  }, [navigation]);
+  }, [navigation, employeeInfo]);
 
   // ✅ Auto refresh mỗi 30 giây
   useEffect(() => {
     const interval = setInterval(() => {
-      loadScanHistory();
+      if (employeeInfo) {
+        loadScanHistory();
+      }
     }, 30000); // 30 seconds
 
     return () => clearInterval(interval);
-  }, []);
+  }, [employeeInfo]);
 
   const loadEmployeeInfo = async () => {
     try {
       const info = await AsyncStorage.getItem('userData');
       if (info) {
-        setEmployeeInfo(JSON.parse(info));
+        const parsedInfo = JSON.parse(info);
+        setEmployeeInfo(parsedInfo);
+        console.log('Current employee:', parsedInfo); // Debug log
       }
     } catch (error) {
       console.error('Load employee info error:', error);
@@ -55,11 +67,15 @@ const ScanHistoryScreen = ({ navigation, route }) => {
   };
 
   const loadScanHistory = async () => {
+    if (!employeeInfo) return;
+    
     try {
       setLoading(true);
       
       const token = await AsyncStorage.getItem('userToken');
-      const url = `${API_CONFIG.BASE_URL}/tickets/scan-history`;
+      
+      // ✅ GIẢI PHÁP 1: Thêm employeeId vào API call
+      const url = `${API_CONFIG.BASE_URL}/tickets/scan-history?employeeId=${employeeInfo.id || employeeInfo._id}`;
       
       const response = await fetch(url, {
         method: 'GET',
@@ -71,48 +87,122 @@ const ScanHistoryScreen = ({ navigation, route }) => {
 
       if (response.ok) {
         const data = await response.json();
-        setScanHistory(data.data || []);
+        let historyData = data.data || [];
+        
+        // ✅ GIẢI PHÁP 2: Lọc dữ liệu theo nhân viên hiện tại (fallback)
+        // Nếu backend chưa hỗ trợ filter theo employeeId
+        const currentEmployeeId = employeeInfo.id || employeeInfo._id || employeeInfo.employeeId;
+        historyData = historyData.filter(item => {
+          const scannedById = item.scannedBy || item.employeeId || item.scannedByEmployeeId;
+          return scannedById === currentEmployeeId;
+        });
+        
+        setScanHistory(historyData);
       } else {
-        // Fallback to AsyncStorage
-        const history = await AsyncStorage.getItem('scanHistory');
-        if (history) {
-          setScanHistory(JSON.parse(history));
-        }
-      }
+        // Fallback to AsyncStorage với filter theo nhân viên
+        await loadLocalHistory();
+}
     } catch (error) {
       console.error('Load scan history error:', error);
-      // Fallback to AsyncStorage
-      const history = await AsyncStorage.getItem('scanHistory');
-      if (history) {
-        setScanHistory(JSON.parse(history));
-      }
+      // Fallback to AsyncStorage với filter theo nhân viên
+      await loadLocalHistory();
     } finally {
       setLoading(false);
     }
   };
 
-  // ✅ Manual refresh function
-  const handleRefresh = async () => {
-    await loadScanHistory();
+  // ✅ Load và filter local history theo nhân viên
+  const loadLocalHistory = async () => {
+    try {
+      const history = await AsyncStorage.getItem('scanHistory');
+      if (history && employeeInfo) {
+        const allHistory = JSON.parse(history);
+        const currentEmployeeId = employeeInfo.id || employeeInfo._id || employeeInfo.employeeId;
+        
+        // Lọc chỉ lấy lịch sử của nhân viên hiện tại
+        const employeeHistory = allHistory.filter(item => {
+          const scannedById = item.scannedBy || item.employeeId || item.scannedByEmployeeId;
+          return scannedById === currentEmployeeId;
+        });
+        
+        setScanHistory(employeeHistory);
+      }
+    } catch (error) {
+      console.error('Load local history error:', error);
+      setScanHistory([]);
+    }
   };
 
+  // ✅ Manual refresh function
+  const handleRefresh = async () => {
+    if (employeeInfo) {
+      await loadScanHistory();
+    }
+  };
+
+  // ✅ Clear history chỉ của nhân viên hiện tại
   const clearHistory = () => {
     Alert.alert(
       'Xóa lịch sử',
-      'Bạn có chắc chắn muốn xóa toàn bộ lịch sử quét vé?',
+      'Bạn có chắc chắn muốn xóa toàn bộ lịch sử quét vé của bạn?',
       [
         { text: 'Hủy', style: 'cancel' },
         {
           text: 'Xóa',
           style: 'destructive',
           onPress: async () => {
-            await AsyncStorage.removeItem('scanHistory');
-            setScanHistory([]);
-            Alert.alert('Thành công', 'Đã xóa toàn bộ lịch sử');
-},
+            try {
+              // Nếu có API để xóa lịch sử theo nhân viên
+              const token = await AsyncStorage.getItem('userToken');
+              const currentEmployeeId = employeeInfo.id || employeeInfo._id || employeeInfo.employeeId;
+              
+              const response = await fetch(`${API_CONFIG.BASE_URL}/tickets/scan-history/${currentEmployeeId}`, {
+                method: 'DELETE',
+                headers: {
+                  ...DEFAULT_HEADERS,
+                  'Authorization': `Bearer ${token}`
+                }
+              });
+
+              if (response.ok) {
+                setScanHistory([]);
+                Alert.alert('Thành công', 'Đã xóa lịch sử quét vé của bạn');
+              } else {
+                // Fallback: xóa local storage
+                await clearLocalHistory();
+              }
+            } catch (error) {
+              console.error('Clear history error:', error);
+              // Fallback: xóa local storage
+              await clearLocalHistory();
+            }
+          },
         },
       ]
     );
+  };
+
+  // ✅ Clear local history chỉ của nhân viên hiện tại
+  const clearLocalHistory = async () => {
+    try {
+      const history = await AsyncStorage.getItem('scanHistory');
+      if (history && employeeInfo) {
+        const allHistory = JSON.parse(history);
+        const currentEmployeeId = employeeInfo.id || employeeInfo._id || employeeInfo.employeeId;
+// Giữ lại lịch sử của nhân viên khác, xóa chỉ lịch sử của nhân viên hiện tại
+        const otherEmployeesHistory = allHistory.filter(item => {
+          const scannedById = item.scannedBy || item.employeeId || item.scannedByEmployeeId;
+          return scannedById !== currentEmployeeId;
+        });
+        
+        await AsyncStorage.setItem('scanHistory', JSON.stringify(otherEmployeesHistory));
+        setScanHistory([]);
+        Alert.alert('Thành công', 'Đã xóa lịch sử quét vé của bạn');
+      }
+    } catch (error) {
+      console.error('Clear local history error:', error);
+      Alert.alert('Lỗi', 'Không thể xóa lịch sử');
+    }
   };
 
   const formatDate = (dateString) => {
@@ -178,7 +268,7 @@ const ScanHistoryScreen = ({ navigation, route }) => {
       <Ionicons name="document-text-outline" size={80} color="#666" />
       <Text style={styles.emptyText}>Chưa có lịch sử quét vé</Text>
       <Text style={styles.emptySubText}>
-        Các vé đã quét sẽ được hiển thị ở đây
+        Các vé bạn đã quét sẽ được hiển thị ở đây
       </Text>
       <TouchableOpacity style={styles.refreshButton} onPress={handleRefresh}>
         <Ionicons name="refresh-outline" size={16} color="#000" />
@@ -189,7 +279,7 @@ const ScanHistoryScreen = ({ navigation, route }) => {
 
   if (loading && scanHistory.length === 0) {
     return (
-      <View style={styles.loadingContainer}>
+<View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color="#FCC434" />
         <Text style={styles.loadingText}>Đang tải lịch sử...</Text>
       </View>
@@ -208,7 +298,7 @@ const ScanHistoryScreen = ({ navigation, route }) => {
         </View>
         
         <View style={styles.headerActions}>
-{/* ✅ Manual refresh button */}
+          {/* ✅ Manual refresh button */}
           <TouchableOpacity style={styles.refreshHeaderButton} onPress={handleRefresh}>
             <Ionicons name="refresh-outline" size={20} color="#FCC434" />
           </TouchableOpacity>
@@ -274,7 +364,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#000',
   },
   loadingContainer: {
-    flex: 1,
+flex: 1,
     backgroundColor: '#000',
     justifyContent: 'center',
     alignItems: 'center',
@@ -307,7 +397,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 8,
   },
-refreshHeaderButton: {
+  refreshHeaderButton: {
     width: 40,
     height: 40,
     borderRadius: 20,
@@ -430,7 +520,7 @@ refreshHeaderButton: {
     paddingVertical: 4,
     borderRadius: 12,
   },
-  statusText: {
+statusText: {
     color: '#fff',
     fontSize: 12,
     fontWeight: 'bold',

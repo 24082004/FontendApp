@@ -89,11 +89,40 @@ const renderFoodItems = (foodItems) => {
 };
 
 const formatShowtime = (showtime) => {
-  if (!showtime) return "N/A";
+  if (!showtime) return 'N/A';
   
-  if (typeof showtime === "object") {
-    if (showtime.time) return String(showtime.time);
-    if (showtime.datetime) return String(showtime.datetime);
+  // Nếu showtime là object từ API (logic từ TicketScreen)
+  if (typeof showtime === 'object') {
+    // Logic giống hệt TicketScreen
+    if (showtime.time && showtime.date) {
+      try {
+        const timeDate = new Date(showtime.time);
+        const dateOnly = new Date(showtime.date);
+        
+        // Kết hợp date và time GIỐNG HỆT TicketScreen
+        const combinedDateTime = new Date(
+          dateOnly.getFullYear(),
+          dateOnly.getMonth(),
+          dateOnly.getDate(),
+          timeDate.getHours(),
+          timeDate.getMinutes(),
+          timeDate.getSeconds()
+        );
+        
+        const timeStr = combinedDateTime.toLocaleTimeString("vi-VN", {
+          hour: "2-digit",
+          minute: "2-digit",
+          hour12: false,
+        });
+        const dateStr = combinedDateTime.toLocaleDateString("vi-VN");
+        
+        return `${timeStr} - ${dateStr}`;
+      } catch (error) {
+        console.log('PaymentScreen - Error:', error);
+      }
+    }
+    
+    // Fallback cho startTime
     if (showtime.startTime) {
       try {
         const date = new Date(showtime.startTime);
@@ -101,30 +130,45 @@ const formatShowtime = (showtime) => {
         const timeStr = date.toLocaleTimeString("vi-VN", {
           hour: "2-digit",
           minute: "2-digit",
+          hour12: false,
         });
         return `${timeStr} - ${dateStr}`;
       } catch (error) {
         return String(showtime.startTime);
       }
     }
-    return showtime._id || showtime.id || "N/A";
+    
+    // Các fallback khác
+    if (showtime.datetime) return formatSingleDateTime(showtime.datetime);
+    if (showtime.time) return formatSingleDateTime(showtime.time);
+    
+    // Fallback cuối nếu có _id
+    if (showtime._id) {
+      return 'N/A';
+    }
   }
   
+  // Nếu showtime là string hoặc Date
+  return formatSingleDateTime(showtime);
+};
+
+const formatSingleDateTime = (dateTimeInput) => {
   try {
-    const date = new Date(showtime);
+    const date = dateTimeInput instanceof Date ? dateTimeInput : new Date(dateTimeInput);
+    
     if (!isNaN(date.getTime())) {
       const dateStr = date.toLocaleDateString("vi-VN");
       const timeStr = date.toLocaleTimeString("vi-VN", {
         hour: "2-digit",
         minute: "2-digit",
+        hour12: false,
       });
       return `${timeStr} - ${dateStr}`;
     }
   } catch (error) {
-    // Fallback to string
+    return String(dateTimeInput);
   }
-  
-  return String(showtime);
+  return String(dateTimeInput);
 };
 
 // ================================
