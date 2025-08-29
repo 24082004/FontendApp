@@ -15,6 +15,7 @@ import {
   Modal
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Feather';
+import { Picker } from '@react-native-picker/picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as ImagePicker from 'expo-image-picker';
 import { API_CONFIG, DEFAULT_HEADERS } from '../config/api';
@@ -151,6 +152,7 @@ const EditProfileScreen = ({ navigation, route }) => {
         name: formData.name.trim(),
         number_phone: formData.number_phone.trim(),
         date_of_birth: formData.date_of_birth || null,
+        gender: formData.gender || profileData.gender || null,
         image: imageUrl || null,
       };
 
@@ -430,22 +432,23 @@ const EditProfileScreen = ({ navigation, route }) => {
                 <Icon name="calendar" size={20} color="#666" />
               </TouchableOpacity>
             </View>
-
-            {/* Gender Field (Read-only) */}
-            <View style={styles.inputContainer}>
-              <Text style={styles.inputLabel}>Giới tính</Text>
-              <TextInput
-                style={[styles.textInput, styles.readOnlyInput]}
-                value={
-                  profileData.gender === 'male' ? 'Nam' : 
-                  profileData.gender === 'female' ? 'Nữ' : 
-                  profileData.gender === 'other' ? 'Khác' : 'Chưa cập nhật'
+          <View style={styles.inputContainer}>
+            <Text style={styles.inputLabel}>Giới tính</Text>
+            <View style={styles.selectInput}>
+              <Picker
+                selectedValue={formData.gender || profileData.gender || 'other'}
+                style={{ color: '#fff', flex: 1 }}
+                dropdownIconColor="#fff"
+                onValueChange={(itemValue) =>
+                  setFormData({ ...formData, gender: itemValue })
                 }
-                editable={false}
-                placeholderTextColor="#666"
-              />
-              <Text style={styles.helperText}>Giới tính không thể thay đổi</Text>
+              >
+                <Picker.Item label="Nam" value="male" />
+                <Picker.Item label="Nữ" value="female" />
+                <Picker.Item label="Khác" value="other" />
+              </Picker>
             </View>
+          </View>
           </View>
         </ScrollView>
 

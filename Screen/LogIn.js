@@ -174,9 +174,6 @@ const Login = ({ navigation }) => {
           <Feather name={rememberMe ? 'check-circle' : 'circle'} size={18} color={rememberMe ? '#FFC107' : '#888'} />
           <Text style={styles.rememberText}>Nhớ mật khẩu</Text>
         </TouchableOpacity>
-        <TouchableOpacity>
-          <Text style={styles.forgotText}>Quên mật khẩu</Text>
-        </TouchableOpacity>
       </View>
 
       <View style={styles.otpContainer}>
